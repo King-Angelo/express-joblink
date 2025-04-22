@@ -1,0 +1,12 @@
+express
+ejs
+body-parser
+express-session
+connect-pg-simple
+pg
+bcrypt
+winston
+morgan
+dotenv
+cookie-parser
+cors

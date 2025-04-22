@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobLink Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center the main content */
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
+            width: 100%; /* Make top bar full width */
+            position: fixed; /* Keep the top bar fixed */
+            top: 0;
+            left: 0;
+            z-index: 100; /* Ensure it's above other content */
+        }
+        .top-left-section {
+            display: flex;
+            align-items: center; /* Align logo and links horizontally */
+        }
+        .logo-placeholder {
+            width: 40px; /* Adjust logo width as needed */
+            height: 40px;
+            background-color: #eee; /* Placeholder background */
+            border-radius: 5px;
+            margin-right: 10px; /* Space between logo and Home */
+        }
+        .top-left-links {
+            display: flex;
+            align-items: center;
+        }
+        .nav-link {
+            color: #333;
+            text-decoration: none;
+            margin-right: 15px;
+            font-weight: normal; /* Minimalistic, so remove bold */
+            font-size: 1.1em;
+        }
+        .nav-link:hover {
+            color: #007bff;
+        }
+        .top-right-nav {
+            display: flex;
+            align-items: center;
+        }
+        .nav-icon {
+            padding: 8px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: transparent;
+            color: #555;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+        .nav-icon:hover {
+            background-color: #eee;
+        }
+        .logout-button {
+            min-width: 80px;
+            height: 40px; /* Ensure minimum height */
+            display: flex; /* For vertical centering */
+            align-items: center;
+            justify-content: center; /* Center the icon */
+            padding: 8px 12px;
+            margin-left: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #333;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+        .logout-button:hover {
+            background-color: #eee;
+        }
+
+        #main-content {
+            margin-top: 70px; /* Adjust margin */
+            width: 80%;
+            max-width: 960px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Inter', sans-serif; /* Apply font here as well */
+        }
+
+        /* Styling for the search area within main-content */
+        .search-area {
+            width: 100%;
+            max-width: 650px;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .search-container {
+            display: flex;
+            width: 100%;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+        }
+        .search-input {
+            padding: 12px;
+            border: none;
+            flex-grow: 2; /* Give more weight to the keyword input */
+            font-size: 1.1em;
+        }
+        .location-input-wrapper {
+            display: flex;
+            align-items: center;
+            border-left: 1px solid #ccc;
+            padding: 12px 8px; /* Reduced right padding */
+            font-size: 1.1em;
+            flex-grow: 1; /* Let it take some space but less than keywords */
+        }
+        .location-input-wrapper i {
+            margin-right: 5px; /* Slightly reduced icon margin */
+            color: #777;
+        }
+        .location-input {
+            border: none;
+            flex-grow: 1;
+            font-size: 1.1em;
+            outline: none;
+        }
+        .search-button {
+            padding: 12px 8px; /* Further reduced horizontal padding */
+            border: none;
+            background-color: #facc15;
+            color: #111;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em; /* Further reduced font size */
+            white-space: nowrap;
+        }
+        .search-button:hover {
+            background-color: #eab308; /* Darker yellow on hover */
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjust min width */
+            gap: 20px;
+            margin-top: 20px; /* Space between search and cards */
+            width: 100%; /* Take full width of main content */
+        }
+
+        .card {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px; /* More rounded corners for the box */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
+            border: 1px solid #ddd; /* Subtle border */
+        }
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #222;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 2px solid #facc15; /* Yellow underline for title */
+            padding-bottom: 5px;
+        }
+        .card p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        .card ul {
+            list-style: none;
+            padding: 0;
+            font-size: 14px;
+            color: #444;
+        }
+        .card ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .card ul li:last-child {
+            border-bottom: none;
+        }
+        .card .view-all {
+            display: block;
+            margin-top: 12px;
+            color: #facc15;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .recent-activity, .resources, .followed-companies {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px; /* Box type */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            margin-top: 20px; /* Space between sections */
+            width: 100%; /* Take full width of main content */
+            max-width: 960px; /* Adjust max width */
+        }
+        .recent-activity h3, .resources h3, .followed-companies h3 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #222;
+            border-bottom: 2px solid #facc15; /* Yellow underline */
+            padding-bottom: 5px;
+        }
+        .recent-activity ul, .resources ul, .followed-companies ul {
+            list-style: none;
+            padding: 0;
+            font-size: 14px;
+            color: #444;
+        }
+        .recent-activity ul li, .resources ul li, .followed-companies ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .recent-activity ul li:last-child, .resources ul li:last-child, .followed-companies ul li:last-child {
+            border-bottom: none;
+        }
+        .resources ul li a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-left-section">
+            <a href="/dashboard" class="logo-placeholder"></a>
+            <div class="top-left-links">
+                <a href="/dashboard" class="nav-link">Home</a>
+                <a href="/company-reviews" class="nav-link">Company Reviews</a>
+            </div>
+        </div>
+        <div class="top-right-nav">
+            <a href="/profile" class="nav-icon" title="Profile">
+                <i class="fas fa-user"></i>
+            </a>
+            <a href="/saved-jobs" class="nav-icon" title="Saved Jobs">
+                <i class="fas fa-heart"></i>
+            </a>
+            <button class="nav-icon">
+                <i class="fas fa-bell"></i>
+            </button>
+            <button class="nav-icon">
+                <i class="fas fa-envelope"></i>
+            </button>
+            <form action="/api/auth/logout" method="POST" style="margin: 0;">
+                <button type="submit" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div class="search-area">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Job title, keywords, or company">
+                <div class="location-input-wrapper">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" class="location-input" placeholder="Location" value="Manila">
+                </div>
+                <button class="search-button">Find Jobs</button>
+            </div>
+        </div>
+
+        <div class="cards-container">
+            <div class="card">
+                <h3>New Job Alerts</h3>
+                <p>You have <%= typeof newJobs !== 'undefined' ? newJobs : 0 %> new jobs.</p>
+                <a href="/job-alerts" style="color: #facc15; text-decoration: none;">View All New Jobs</a>
+            </div>
+
+            <div class="card">
+                <h3>Application Status</h3>
+                <p>Your recent applications:</p>
+                <a href="/applications" style="color: #facc15; text-decoration: none;">View All Applications</a>
+            </div>
+
+            <div class="card">
+                <h3>Saved Jobs</h3>
+                <p>You have <%= typeof savedJobs !== 'undefined' ? savedJobs : 0 %> saved jobs.</p>
+                <a href="/saved-jobs" style="color: #facc15; text-decoration: none;">View All Saved Jobs</a>
+            </div>
+
+            <div class="card">
+                <h3>Recommended Jobs</h3>
+                <ul id="recommended-job-list">
+                </ul>
+                <a href="/recommended-jobs" class="view-all">View All Recommendations</a>
+            </div>
+        </div>
+
+        <div class="recent-activity">
+            <h3>Recent Activity</h3>
+            <% if (typeof recentActivity !== 'undefined' && recentActivity.length > 0) { %>
+                <ul style="list-style: none; padding: 0;">
+                    <% recentActivity.forEach(activity => { %>
+                        <li style="margin: 10px 0; padding: 10px; border: 1px solid #eee; border-radius: 5px;">
+                            <%= activity %>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } else { %>
+                <p>No recent activity</p>
+            <% } %>
+        </div>
+
+        <div class="resources">
+            <h3>Resources & Tips</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <a href="/resources/resume" style="color: #007bff; text-decoration: none;">Resume Writing Guide</a>
+                <a href="/resources/interview" style="color: #007bff; text-decoration: none;">Interview Tips</a>
+                <a href="/resources/networking" style="color: #007bff; text-decoration: none;">Networking Strategies</a>
+            </div>
+        </div>
+
+        <div class="followed-companies">
+            <h3>Followed Companies</h3>
+            <ul id="followed-companies-list">
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const companyReviewsLink = document.getElementById('company-reviews-link');
+            const editProfileLink = document.getElementById('edit-profile-link');
+            const savedJobsLink = document.getElementById('saved-jobs-link');
+            const applicationsLink = document.getElementById('applications-link');
+            const mainContent = document.getElementById('main-content');
+
+            companyReviewsLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                loadContent('/company-reviews-partial', 'main-content');
+                });
+    
+            });
+
+            editProfileLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                loadContent('/profile/edit-partial', 'main-content');
+            });
+
+            savedJobsLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                loadContent('/saved-jobs-partial', 'main-content');
+            });
+
+            applicationsLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                loadContent('/applications-partial', 'main-content');
+            });
+
+            function loadContent(url, targetElementId) {
+                fetch(url)
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById(targetElementId).innerHTML = data;
+                        // You might need to re-initialize JavaScript for the loaded content here
+                    })
+                    .catch(error => {
+                        console.error('Error fetching content:', error);
+                        document.getElementById(targetElementId).innerHTML = '<p>Failed to load content.</p>';
+                    });
+            }
+
+            // Example of loading initial dashboard data
+            const newJobs = [{ title: 'Software Engineer', company: 'Tech Co' }, { title: 'Data Analyst', company: 'Data Corp' }];
+            const applicationStatuses = [{ job: 'Software Engineer', company: 'Tech Co', status: 'Under Review' }, { job: 'Marketing Manager', company: 'Global Inc', status: 'Submitted' }];
+            const savedJobsData = [{ title: 'Product Manager', company: 'Innovate Ltd' }];
+            const recommendedJobsData = [{ title: 'Frontend Developer', company: 'Web Solutions' }];
+            const recentActivityData = ['Saved job at Innovate Ltd', 'Applied for Software Engineer at Tech Co'];
+            const followedCompaniesData = ['Tech Co', 'Innovate Ltd'];
+
+            const newJobCount = document.getElementById('new-job-count');
+            const newJobList = document.getElementById('new-job-list');
+            const applicationStatusList = document.getElementById('application-status-list');
+            const savedJobCount = document.getElementById('saved-job-count');
+            const savedJobList = document.getElementById('saved-job-list');
+            const recommendedJobList = document.getElementById('recommended-job-list');
+            const recentActivityList = document.getElementById('recent-activity-list');
+            const followedCompaniesList = document.getElementById('followed-companies-list');
+
+            if (newJobCount) newJobCount.textContent = newJobs.length;
+            if (newJobList) newJobs.forEach(job => { 
+                const li = document.createElement('li'); 
+                li.textContent = `${job.title} at ${job.company}`; 
+                newJobList.appendChild(li); 
+            });
+
+            document.querySelector('.search-button').addEventListener('click', function() {
+                const keyword = document.querySelector('.search-input').value;
+                const location = document.querySelector('.location-input').value;
+                // Implement search functionality
+                console.log('Searching for:', keyword, 'in', location);
+            });
+        });
+    </script>
+</body>
+</html>

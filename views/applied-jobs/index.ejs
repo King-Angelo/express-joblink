@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applied Jobs / Notifications</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .notification-card, .application-card { background-color: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .notification-title, .application-title { font-size: 1.1em; font-weight: bold; margin-bottom: 5px; }
+        .notification-details, .application-details { color: #555; margin-bottom: 10px; }
+        .notification-date, .application-date { color: #999; font-size: 0.9em; }
+        .application-status { font-weight: bold; color: #007bff; }
+        h1 { color: #333; margin-bottom: 20px; }
+        .no-items { color: #777; }
+    </style>
+</head>
+<body>
+    <h1>Applied Jobs</h1>
+
+    <% if (applications && applications.length > 0) { %>
+        <% applications.forEach(app => { %>
+            <div class="application-card">
+                <div class="application-title"><%= app.jobTitle %> at <%= app.companyName %></div>
+                <div class="application-details">Applied on: <%= new Date(app.appliedDate).toLocaleDateString() %></div>
+                <div class="application-status">Status: <%= app.status %></div>
+                </div>
+        <% }); %>
+    <% } else { %>
+        <p class="no-items">You haven't applied for any jobs yet.</p>
+    <% } %>
+
+    <hr>
+
+    <h1>Notifications</h1>
+
+    <% if (notifications && notifications.length > 0) { %>
+        <% notifications.forEach(notification => { %>
+            <div class="notification-card">
+                <div class="notification-title"><%= notification.title %></div>
+                <div class="notification-details"><%= notification.message %></div>
+                <div class="notification-date">Received on: <%= new Date(notification.date).toLocaleDateString() %></div>
+                </div>
+        <% }); %>
+    <% } else { %>
+        <p class="no-items">No new notifications.</p>
+    <% } %>
+
+    <p><a href="/">Back to Dashboard</a></p>
+</body>
+</html>

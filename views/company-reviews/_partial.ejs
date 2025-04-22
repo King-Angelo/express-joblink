@@ -1,0 +1,76 @@
+<style>
+    .reviews-content {
+        padding-top: 40px;
+    }
+
+    .review-card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        position: relative;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .company-name {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .rating {
+        color: gold;
+        font-size: 1.1em;
+        margin-bottom: 5px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .review-text {
+        color: #555;
+        margin-bottom: 10px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .review-date {
+        color: #999;
+        font-size: 0.9em;
+        font-family: 'Inter', sans-serif;
+    }
+
+    h1 {
+        color: #333;
+        margin-bottom: 10px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .no-reviews {
+        color: #777;
+        font-family: 'Inter', sans-serif;
+    }
+</style>
+
+<a href="/" class="back-icon">
+    <i class="fas fa-arrow-left"></i>
+</a>
+
+<div class="reviews-content">
+    <h1>Company Reviews</h1>
+    <% if (reviews && reviews.length > 0) { %>
+        <% reviews.forEach(review => { %>
+            <div class="review-card">
+                <div class="company-name"><%= review.companyName %></div>
+                <div class="rating">
+                    <% for (let i = 0; i < review.rating; i++) { %>
+                        ★
+                    <% } %>
+                </div>
+                <div class="review-text"><%= review.reviewText %></div>
+                <div class="review-date">Reviewed on: <%= new Date(review.date).toLocaleDateString() %></div>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <p class="no-reviews">No company reviews available yet.</p>
+    <% } %>
+</div>

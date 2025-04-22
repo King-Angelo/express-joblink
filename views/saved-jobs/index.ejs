@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Jobs</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .job-card { background-color: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .job-details { flex-grow: 1; }
+        .job-title { font-size: 1.1em; font-weight: bold; margin-bottom: 5px; }
+        .company-name { color: #555; margin-bottom: 5px; }
+        .location { color: #777; font-size: 0.9em; }
+        .actions button { background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em; }
+        .actions button:hover { background-color: #c82333; }
+        h1 { color: #333; margin-bottom: 20px; }
+        .no-jobs { color: #777; }
+    </style>
+</head>
+<body>
+    <h1>Saved Jobs</h1>
+
+    <% if (savedJobs && savedJobs.length > 0) { %>
+        <% savedJobs.forEach(job => { %>
+            <div class="job-card">
+                <div class="job-details">
+                    <div class="job-title"><%= job.title %></div>
+                    <div class="company-name"><%= job.company %></div>
+                    <div class="location"><%= job.location %></div>
+                    </div>
+                <div class="actions">
+                    <button onclick="unsaveJob('<%= job.id %>')">Unsave</button>
+                </div>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <p class="no-jobs">You haven't saved any jobs yet.</p>
+    <% } %>
+
+    <p><a href="/">Back to Dashboard</a></p>
+
+    <script>
+        function unsaveJob(jobId) {
+            // Implement JavaScript to send a request to your server
+            // to remove the job with the given ID from the user's saved jobs.
+            console.log('Unsave job with ID:', jobId);
+            // Example using fetch API:
+            fetch('/saved-jobs/unsave/' + jobId, {
+                method: 'POST', // Or DELETE, depending on your server-side route
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add any necessary authentication headers
+                },
+                // Optionally include a body if needed
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the UI to remove the unsaved job
+                    window.location.reload(); // Simple reload for demonstration
+                } else {
+                    alert('Error unsaving job.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred.');
+            });
+        }
+    </script>
+    
