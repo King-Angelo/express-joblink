@@ -186,3 +186,91 @@
 {"level":"info","message":"MongoDB Connected: ac-1msi4rb-shard-00-00.8ycuftc.mongodb.net","timestamp":"2025-04-22T03:29:31.922Z"}
 {"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T03:50:56.555Z"}
 {"level":"info","message":"MongoDB Connected: ac-1msi4rb-shard-00-00.8ycuftc.mongodb.net","timestamp":"2025-04-22T03:51:03.375Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T05:18:17.652Z"}
+{"level":"info","message":"MongoDB Connected: ac-1msi4rb-shard-00-00.8ycuftc.mongodb.net","timestamp":"2025-04-22T07:48:30.628Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T08:02:23.264Z"}
+{"level":"info","message":"MongoDB Connected: ac-1msi4rb-shard-00-00.8ycuftc.mongodb.net","timestamp":"2025-04-22T11:39:19.400Z"}
+{"level":"info","message":"MongoDB Connected: ac-1msi4rb-shard-00-00.8ycuftc.mongodb.net","timestamp":"2025-04-22T12:15:34.640Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T12:15:35.947Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T12:16:00.840Z"}
+{"level":"info","message":"MongoDB Connected: ac-1msi4rb-shard-00-01.8ycuftc.mongodb.net","timestamp":"2025-04-22T12:18:09.186Z"}
+{"level":"info","message":"MongoDB Connected: ac-1msi4rb-shard-00-01.8ycuftc.mongodb.net","timestamp":"2025-04-22T12:37:22.315Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T12:37:27.581Z"}
+{"level":"info","message":"MongoDB Connected: ac-1msi4rb-shard-00-02.8ycuftc.mongodb.net","timestamp":"2025-04-22T12:37:44.769Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T12:40:11.998Z"}
+{"level":"info","message":"MongoDB Connected: ac-1msi4rb-shard-00-02.8ycuftc.mongodb.net","timestamp":"2025-04-22T12:43:57.408Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T12:49:02.787Z"}
+{"level":"info","message":"MongoDB Connected: ac-1msi4rb-shard-00-02.8ycuftc.mongodb.net","timestamp":"2025-04-22T12:49:06.363Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-22T12:57:43.115Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T12:57:57.221Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-22T12:58:03.130Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T13:00:03.443Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T15:00:23.794Z"}
+{"level":"info","message":"Mongoose connected to MongoDB","timestamp":"2025-04-22T15:00:23.865Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-22T15:02:32.788Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T16:16:53.998Z"}
+{"level":"info","message":"Mongoose connected to MongoDB","timestamp":"2025-04-22T16:16:54.361Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T18:40:10.291Z"}
+{"level":"info","message":"Mongoose connected to MongoDB","timestamp":"2025-04-22T18:40:20.342Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-22T22:05:12.444Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-23T07:32:03.184Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-23T07:46:53.371Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-23T07:53:59.363Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-28T14:36:25.576Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-28T14:37:04.755Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-28T14:37:09.933Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-28T14:37:28.261Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-28T14:37:33.292Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-28T21:25:15.195Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-29T14:11:19.055Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-29T14:32:57.779Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-29T14:33:02.151Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-29T14:43:49.668Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-29T14:43:53.566Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-29T15:11:39.505Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-29T15:11:48.192Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-29T23:14:21.746Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-30T04:51:26.333Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-30T07:04:39.227Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-30T08:31:24.524Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-30T08:55:45.662Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-30T08:56:08.844Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-30T09:04:53.232Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-04-30T09:04:57.107Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-30T09:11:42.471Z"}
+{"level":"info","message":"Mongoose connected to MongoDB","timestamp":"2025-04-30T09:11:52.506Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-30T09:29:52.255Z"}
+{"level":"info","message":"Mongoose connected to MongoDB","timestamp":"2025-04-30T09:30:02.298Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-30T09:48:37.030Z"}
+{"level":"info","message":"Mongoose connected to MongoDB","timestamp":"2025-04-30T09:48:47.058Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-04-30T10:03:06.819Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-02T00:11:22.946Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-02T01:04:32.132Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-02T01:04:34.271Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-02T01:05:38.081Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-02T01:15:37.265Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-03T03:24:47.035Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-03T03:33:45.435Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-03T03:36:07.732Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-03T03:46:30.973Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-03T03:46:43.124Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-03T03:53:12.921Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-03T03:53:15.363Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-03T03:55:31.101Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-03T03:55:34.769Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-03T04:07:54.971Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-03T04:07:58.384Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-03T04:15:52.295Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-03T04:15:59.118Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-03T04:34:37.357Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-03T04:34:59.088Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-03T04:53:00.077Z"}
+{"code":8000,"codeName":"AtlasError","connectionGeneration":0,"errorLabelSet":{},"errorResponse":{"code":8000,"codeName":"AtlasError","errmsg":"bad auth : Authentication failed.","ok":0},"level":"error","message":"MongoDB connection error: bad auth : Authentication failed.","ok":0,"stack":"MongoServerError: bad auth : Authentication failed.\n    at Connection.sendCommand (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\connection.js:299:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async Connection.command (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\connection.js:327:26)\n    at async executeScram (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\auth\\scram.js:79:22)\n    at async ScramSHA256.auth (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\auth\\scram.js:39:16)\n    at async performInitialHandshake (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\connect.js:104:13)\n    at async connect (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\connect.js:24:9)","timestamp":"2025-05-03T04:53:17.479Z"}
+{"code":8000,"codeName":"AtlasError","connectionGeneration":0,"errorLabelSet":{},"errorResponse":{"code":8000,"codeName":"AtlasError","errmsg":"bad auth : Authentication failed.","ok":0},"level":"error","message":"MongoDB connection error: bad auth : Authentication failed.","ok":0,"stack":"MongoServerError: bad auth : Authentication failed.\n    at Connection.sendCommand (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\connection.js:299:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async Connection.command (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\connection.js:327:26)\n    at async executeScram (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\auth\\scram.js:79:22)\n    at async ScramSHA256.auth (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\auth\\scram.js:39:16)\n    at async performInitialHandshake (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\connect.js:104:13)\n    at async connect (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\connect.js:24:9)","timestamp":"2025-05-03T05:13:50.007Z"}
+{"code":8000,"codeName":"AtlasError","connectionGeneration":0,"errorLabelSet":{},"errorResponse":{"code":8000,"codeName":"AtlasError","errmsg":"bad auth : Authentication failed.","ok":0},"level":"error","message":"MongoDB connection error: bad auth : Authentication failed.","ok":0,"stack":"MongoServerError: bad auth : Authentication failed.\n    at Connection.sendCommand (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\connection.js:299:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async Connection.command (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\connection.js:327:26)\n    at async executeScram (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\auth\\scram.js:79:22)\n    at async ScramSHA256.auth (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\auth\\scram.js:39:16)\n    at async performInitialHandshake (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\connect.js:104:13)\n    at async connect (C:\\Users\\King\\OneDrive\\Documents\\FINALS_PROJECTS\\APPDEV\\express-jobportal-app-master\\node_modules\\mongodb\\lib\\cmap\\connect.js:24:9)","timestamp":"2025-05-03T05:17:19.025Z"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.oovze.mongodb.net","timestamp":"2025-05-03T05:25:37.234Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-03T05:33:29.071Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-03T05:33:40.033Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-03T05:48:09.852Z"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2025-05-03T05:48:21.009Z"}
+{"level":"info","message":"Mongoose disconnected from MongoDB","timestamp":"2025-05-03T06:03:57.585Z"}

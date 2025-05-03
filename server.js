@@ -17,43 +17,48 @@ const { authMiddleware } = require("./middleware/authMiddleware");
 const authRoutes = require("./routes/auth");
 const dashboardRoutes = require("./routes/dashboard");
 const pageRoutes = require("./routes/pages");
+const jobRoutes = require("./routes/jobs");
+const profileRoutes = require("./routes/profile");
+const jobAlertRoutes = require("./routes/jobAlerts");
+const employerRoutes = require("./routes/employer");
 
 // Load environment variables
 dotenv.config();
 
+const app = express();
+const PORT = process.env.PORT || 5000;
+
 // Connect to MongoDB
 connectDB();
 
-const app = express();
-
 // Middleware
-app.use(morgan('dev')); // Logging
-app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5000',
-    credentials: true
-}));
-
-// Session configuration BEFORE other middleware
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'fallback-secret-key',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { 
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
-}));
-
+app.use(morgan("dev"));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Session configuration
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
 // Set up view engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
+app.use('/js', express.static(path.join(__dirname, 'public/js')));
 
 // Debug middleware - Log every request (development only)
 if (process.env.NODE_ENV !== 'production') {
@@ -68,37 +73,28 @@ if (process.env.NODE_ENV !== 'production') {
     });
 }
 
+// Simple flash message middleware
+app.use((req, res, next) => {
+    res.locals.flash = {
+        success: req.session.success,
+        error: req.session.error
+    };
+    req.flash = (type, message) => {
+        req.session[type] = message;
+    };
+    next();
+});
+
 // Routes
-app.use('/', pageRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/dashboard', dashboardRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/dashboard", authMiddleware, dashboardRoutes);
+app.use("/jobs", jobRoutes);
+app.use("/profile", profileRoutes);
+app.use("/job-alerts", authMiddleware, jobAlertRoutes);
+app.use("/employer", employerRoutes);
+app.use("/", pageRoutes);
 
-// Root route
-app.get("/", (req, res) => {
-    console.log('Handling root route');
-    try {
-        res.render('index');
-    } catch (err) {
-        console.error('Error rendering index:', err);
-        res.status(500).send('Error rendering page');
-    }
-});
-
-// Login routes
-app.get("/login", (req, res) => {
-    console.log('Handling login route');
-    try {
-        // If user is already logged in, redirect to dashboard
-        if (req.session.userId) {
-            return res.redirect('/dashboard');
-        }
-        res.render("login", { error: null });
-    } catch (err) {
-        console.error('Error rendering login:', err);
-        res.status(500).send('Error rendering login page');
-    }
-});
-
+// Login route
 app.post("/login", async (req, res) => {
     console.log('Processing login attempt:', req.body);
     const { email, password } = req.body;
@@ -115,14 +111,13 @@ app.post("/login", async (req, res) => {
         // Set session
         req.session.userId = user._id;
         await req.session.save();
-        console.log('Session after login:', req.session);
 
         // Set JWT token
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'fallback-secret', { expiresIn: "1h" });
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'your-secret-key', { expiresIn: "24h" });
         res.cookie('token', token, {
             httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            maxAge: 3600000 // 1 hour
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
         });
 
         // Redirect to dashboard
@@ -219,7 +214,15 @@ app.get("/dashboard", async (req, res) => {
             return res.redirect('/login');
         }
 
-        // Render dashboard with user data
+        // Check if user is an employer
+        const Employer = require('./models/Employer');
+        const employerProfile = await Employer.findOne({ user: user._id });
+        if (employerProfile) {
+            // Redirect to employer dashboard
+            return res.redirect('/employer/dashboard');
+        }
+
+        // Render dashboard with user data (job seeker dashboard)
         const dashboardData = {
             user: user,
             newJobs: 5,
@@ -275,6 +278,16 @@ app.get("/applied-jobs", authMiddleware, async (req, res) => {
     res.render("applied-jobs/index", { applications });
 });
 
+// Redirect /job-alerts to /dashboard/alerts
+app.get('/job-alerts', (req, res) => {
+    res.redirect('/dashboard/alerts');
+});
+
+// Redirect /applications to /dashboard/applications
+app.get('/applications', (req, res) => {
+    res.redirect('/dashboard/applications');
+});
+
 // Request logging middleware
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
@@ -284,16 +297,31 @@ app.use((req, res, next) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Global error:', err);
-    res.status(500).render('error', { error: 'Something went wrong!' });
+    
+    // Set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+    // Render the error page
+    res.status(err.status || 500);
+    res.render('error', { 
+        title: 'Error',
+        message: err.message || 'Something went wrong!',
+        error: req.app.get('env') === 'development' ? err : {},
+        isAuthenticated: !!req.session.userId
+    });
 });
 
 // 404 handler
 app.use((req, res) => {
-    res.status(404).render('error', { error: 'Page not found' });
+    res.status(404).render('error', { 
+        title: 'Page Not Found',
+        message: 'The page you are looking for does not exist.',
+        isAuthenticated: !!req.session.userId
+    });
 });
 
-// Server start
-const PORT = process.env.PORT || 5000;
+// Start server
 app.listen(PORT, () => {
     console.clear();
     console.log('='.repeat(50));

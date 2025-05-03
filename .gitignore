@@ -1,1 +1,11 @@
 .env
+node_modules/
+*.log
+.DS_Store
+desktop.ini
+npm-debug.log*
+.vscode/
+.idea/
+coverage/
+build/
+dist/

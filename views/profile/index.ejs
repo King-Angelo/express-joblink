@@ -1,0 +1,168 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Profile Header -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <img src="<%= user.profileImage || '/images/default-avatar.png' %>" 
+                                 alt="Profile Image" 
+                                 class="rounded-circle"
+                                 style="width: 100px; height: 100px; object-fit: cover;">
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h2 class="mb-1"><%= user.name %></h2>
+                            <p class="text-muted mb-2"><%= user.title || 'Job Seeker' %></p>
+                            <p class="mb-0">
+                                <i class="fas fa-map-marker-alt"></i> <%= user.location || 'Location not specified' %>
+                            </p>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <a href="/profile/edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-8">
+            <!-- About Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">About</h5>
+                </div>
+                <div class="card-body">
+                    <p><%= user.bio || 'No bio available' %></p>
+                </div>
+            </div>
+
+            <!-- Skills Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Skills</h5>
+                </div>
+                <div class="card-body">
+                    <% if (user.skills && user.skills.length > 0) { %>
+                        <div class="d-flex flex-wrap gap-2">
+                            <% user.skills.forEach(skill => { %>
+                                <span class="badge bg-primary"><%= skill %></span>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted">No skills added yet</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Work Experience -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Work Experience</h5>
+                </div>
+                <div class="card-body">
+                    <% if (user.experience && user.experience.length > 0) { %>
+                        <% user.experience.forEach(exp => { %>
+                            <div class="mb-3">
+                                <h6 class="mb-1"><%= exp.title %></h6>
+                                <p class="mb-1"><%= exp.company %></p>
+                                <p class="text-muted mb-1">
+                                    <%= new Date(exp.startDate).toLocaleDateString() %> - 
+                                    <%= exp.endDate ? new Date(exp.endDate).toLocaleDateString() : 'Present' %>
+                                </p>
+                                <p><%= exp.description %></p>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="text-muted">No work experience added yet</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Education -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Education</h5>
+                </div>
+                <div class="card-body">
+                    <% if (user.education && user.education.length > 0) { %>
+                        <% user.education.forEach(edu => { %>
+                            <div class="mb-3">
+                                <h6 class="mb-1"><%= edu.degree %></h6>
+                                <p class="mb-1"><%= edu.school %></p>
+                                <p class="text-muted mb-1">
+                                    <%= new Date(edu.startDate).toLocaleDateString() %> - 
+                                    <%= edu.endDate ? new Date(edu.endDate).toLocaleDateString() : 'Present' %>
+                                </p>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="text-muted">No education information added yet</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <!-- Contact Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Contact Information</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <i class="fas fa-envelope"></i> <%= user.email %>
+                    </p>
+                    <% if (user.phone) { %>
+                        <p class="mb-2">
+                            <i class="fas fa-phone"></i> <%= user.phone %>
+                        </p>
+                    <% } %>
+                    <% if (user.linkedin) { %>
+                        <p class="mb-2">
+                            <i class="fab fa-linkedin"></i> 
+                            <a href="<%= user.linkedin %>" target="_blank">LinkedIn Profile</a>
+                        </p>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Job Preferences -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Job Preferences</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>Preferred Job Types:</strong><br>
+                        <% if (user.preferredJobTypes && user.preferredJobTypes.length > 0) { %>
+                            <%= user.preferredJobTypes.join(', ') %>
+                        <% } else { %>
+                            Not specified
+                        <% } %>
+                    </p>
+                    <p class="mb-2">
+                        <strong>Preferred Locations:</strong><br>
+                        <% if (user.preferredLocations && user.preferredLocations.length > 0) { %>
+                            <%= user.preferredLocations.join(', ') %>
+                        <% } else { %>
+                            Not specified
+                        <% } %>
+                    </p>
+                    <p class="mb-0">
+                        <strong>Expected Salary:</strong><br>
+                        <%= user.expectedSalary || 'Not specified' %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %> 

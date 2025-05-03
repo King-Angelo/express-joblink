@@ -23,84 +23,42 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
+            padding: 10px 20px;
             background-color: #fff;
             border-bottom: 1px solid #ddd;
-            width: 100%; /* Make top bar full width */
-            position: fixed; /* Keep the top bar fixed */
+            width: 100%;
+            position: fixed;
             top: 0;
             left: 0;
-            z-index: 100; /* Ensure it's above other content */
+            z-index: 100;
         }
-        .top-left-section {
-            display: flex;
-            align-items: center; /* Align logo and links horizontally */
-        }
-        .logo-placeholder {
-            width: 40px; /* Adjust logo width as needed */
-            height: 40px;
-            background-color: #eee; /* Placeholder background */
-            border-radius: 5px;
-            margin-right: 10px; /* Space between logo and Home */
-        }
-        .top-left-links {
+        .logo {
             display: flex;
             align-items: center;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
         .nav-link {
-            color: #333;
+            color: #666;
             text-decoration: none;
-            margin-right: 15px;
-            font-weight: normal; /* Minimalistic, so remove bold */
-            font-size: 1.1em;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: color 0.2s;
         }
         .nav-link:hover {
             color: #007bff;
         }
-        .top-right-nav {
-            display: flex;
-            align-items: center;
+        .nav-link i {
+            font-size: 1rem;
         }
-        .nav-icon {
-            padding: 8px;
-            margin-left: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: transparent;
-            color: #555;
-            cursor: pointer;
-            font-size: 18px;
-            line-height: 1;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background-color 0.2s ease;
-        }
-        .nav-icon:hover {
-            background-color: #eee;
-        }
-        .logout-button {
-            min-width: 80px;
-            height: 40px; /* Ensure minimum height */
-            display: flex; /* For vertical centering */
-            align-items: center;
-            justify-content: center; /* Center the icon */
-            padding: 8px 12px;
-            margin-left: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #fff;
-            color: #333;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.2s ease;
-        }
-        .logout-button:hover {
-            background-color: #eee;
-        }
-
         #main-content {
             margin-top: 70px; /* Adjust margin */
             width: 80%;
@@ -220,6 +178,77 @@
             font-weight: bold;
         }
 
+        /* Jobs Section Styles */
+        .jobs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .job-item {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+
+        .job-item h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .job-item .company {
+            margin: 0 0 10px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .job-details {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .job-details span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .job-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .skill-badge {
+            background-color: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .view-job-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #facc15;
+            color: #111;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .view-job-btn:hover {
+            background-color: #eab308;
+        }
+
         .recent-activity, .resources, .followed-companies {
             background-color: #fff;
             padding: 15px;
@@ -261,30 +290,28 @@
 </head>
 <body>
     <div class="top-bar">
-        <div class="top-left-section">
-            <a href="/dashboard" class="logo-placeholder"></a>
-            <div class="top-left-links">
-                <a href="/dashboard" class="nav-link">Home</a>
-                <a href="/company-reviews" class="nav-link">Company Reviews</a>
-            </div>
-        </div>
-        <div class="top-right-nav">
-            <a href="/profile" class="nav-icon" title="Profile">
-                <i class="fas fa-user"></i>
+        <a href="/" class="logo">
+            <img src="/images/logo.png" alt="JobLink Logo" height="40">
+        </a>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-link">
+                <i class="fas fa-th-large"></i> Dashboard
             </a>
-            <a href="/saved-jobs" class="nav-icon" title="Saved Jobs">
-                <i class="fas fa-heart"></i>
+            <a href="/profile" class="nav-link">
+                <i class="fas fa-user"></i> Profile
             </a>
-            <button class="nav-icon">
-                <i class="fas fa-bell"></i>
-            </button>
-            <button class="nav-icon">
-                <i class="fas fa-envelope"></i>
-            </button>
-            <form action="/api/auth/logout" method="POST" style="margin: 0;">
-                <button type="submit" class="logout-button">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Logout
+            <a href="/saved-jobs" class="nav-link">
+                <i class="fas fa-heart"></i> Saved Jobs
+            </a>
+            <a href="/job-alerts" class="nav-link">
+                <i class="fas fa-bell"></i> Job Alerts
+            </a>
+            <a href="/contact" class="nav-link">
+                <i class="fas fa-envelope"></i> Contact
+            </a>
+            <form action="/api/auth/logout" method="POST" style="display: inline;">
+                <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </form>
         </div>
@@ -303,135 +330,85 @@
         </div>
 
         <div class="cards-container">
+            <!-- Jobs Section -->
             <div class="card">
-                <h3>New Job Alerts</h3>
-                <p>You have <%= typeof newJobs !== 'undefined' ? newJobs : 0 %> new jobs.</p>
-                <a href="/job-alerts" style="color: #facc15; text-decoration: none;">View All New Jobs</a>
-            </div>
-
-            <div class="card">
-                <h3>Application Status</h3>
-                <p>Your recent applications:</p>
-                <a href="/applications" style="color: #facc15; text-decoration: none;">View All Applications</a>
-            </div>
-
-            <div class="card">
-                <h3>Saved Jobs</h3>
-                <p>You have <%= typeof savedJobs !== 'undefined' ? savedJobs : 0 %> saved jobs.</p>
-                <a href="/saved-jobs" style="color: #facc15; text-decoration: none;">View All Saved Jobs</a>
+                <h3>Available Jobs</h3>
+                <div class="jobs-list">
+                    <% if (jobs && jobs.length > 0) { %>
+                        <% jobs.forEach(job => { %>
+                            <div class="job-item">
+                                <h4><%= job.title %></h4>
+                                <p class="company"><%= job.company %></p>
+                                <div class="job-details">
+                                    <span><i class="fas fa-map-marker-alt"></i> <%= job.location %></span>
+                                    <span><i class="fas fa-briefcase"></i> <%= job.type %></span>
+                                    <span><i class="fas fa-money-bill-wave"></i> <%= job.salary %></span>
+                                </div>
+                                <div class="job-skills">
+                                    <% job.skills.forEach(skill => { %>
+                                        <span class="skill-badge"><%= skill %></span>
+                                    <% }) %>
+                                </div>
+                                <a href="/jobs/<%= job._id %>" class="view-job-btn">View Details</a>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p>No jobs available at the moment.</p>
+                    <% } %>
+                </div>
+                <a href="/jobs" class="view-all">View All Jobs →</a>
             </div>
 
             <div class="card">
                 <h3>Recommended Jobs</h3>
                 <ul id="recommended-job-list">
                 </ul>
-                <a href="/recommended-jobs" class="view-all">View All Recommendations</a>
+                <a href="/jobs/recommended" class="view-all">View All Recommendations</a>
             </div>
-        </div>
 
-        <div class="recent-activity">
-            <h3>Recent Activity</h3>
-            <% if (typeof recentActivity !== 'undefined' && recentActivity.length > 0) { %>
-                <ul style="list-style: none; padding: 0;">
-                    <% recentActivity.forEach(activity => { %>
-                        <li style="margin: 10px 0; padding: 10px; border: 1px solid #eee; border-radius: 5px;">
-                            <%= activity %>
-                        </li>
-                    <% }); %>
+            <div class="card">
+                <h3>Recent Activity</h3>
+                <% if (typeof recentActivity !== 'undefined' && recentActivity.length > 0) { %>
+                    <ul style="list-style: none; padding: 0;">
+                        <% recentActivity.forEach(activity => { %>
+                            <li style="margin: 10px 0; padding: 10px; border: 1px solid #eee; border-radius: 5px;">
+                                <%= activity %>
+                            </li>
+                        <% }); %>
                 </ul>
-            <% } else { %>
-                <p>No recent activity</p>
-            <% } %>
-        </div>
-
-        <div class="resources">
-            <h3>Resources & Tips</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                <a href="/resources/resume" style="color: #007bff; text-decoration: none;">Resume Writing Guide</a>
-                <a href="/resources/interview" style="color: #007bff; text-decoration: none;">Interview Tips</a>
-                <a href="/resources/networking" style="color: #007bff; text-decoration: none;">Networking Strategies</a>
+                <% } else { %>
+                    <p>No recent activity</p>
+                <% } %>
             </div>
-        </div>
-
-        <div class="followed-companies">
-            <h3>Followed Companies</h3>
-            <ul id="followed-companies-list">
-            </ul>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const companyReviewsLink = document.getElementById('company-reviews-link');
-            const editProfileLink = document.getElementById('edit-profile-link');
-            const savedJobsLink = document.getElementById('saved-jobs-link');
-            const applicationsLink = document.getElementById('applications-link');
             const mainContent = document.getElementById('main-content');
+            const recommendedJobList = document.getElementById('recommended-job-list');
 
-            companyReviewsLink.addEventListener('click', (event) => {
-                event.preventDefault();
-                loadContent('/company-reviews-partial', 'main-content');
+            // Example recommended jobs data
+            const recommendedJobsData = [
+                { title: 'Frontend Developer', company: 'Web Solutions' },
+                { title: 'Software Engineer', company: 'Tech Co' },
+                { title: 'Data Analyst', company: 'Data Corp' }
+            ];
+
+            // Populate recommended jobs
+            if (recommendedJobList) {
+                recommendedJobsData.forEach(job => {
+                    const li = document.createElement('li');
+                    li.textContent = `${job.title} at ${job.company}`;
+                    recommendedJobList.appendChild(li);
                 });
-    
-            });
-
-            editProfileLink.addEventListener('click', (event) => {
-                event.preventDefault();
-                loadContent('/profile/edit-partial', 'main-content');
-            });
-
-            savedJobsLink.addEventListener('click', (event) => {
-                event.preventDefault();
-                loadContent('/saved-jobs-partial', 'main-content');
-            });
-
-            applicationsLink.addEventListener('click', (event) => {
-                event.preventDefault();
-                loadContent('/applications-partial', 'main-content');
-            });
-
-            function loadContent(url, targetElementId) {
-                fetch(url)
-                    .then(response => response.text())
-                    .then(data => {
-                        document.getElementById(targetElementId).innerHTML = data;
-                        // You might need to re-initialize JavaScript for the loaded content here
-                    })
-                    .catch(error => {
-                        console.error('Error fetching content:', error);
-                        document.getElementById(targetElementId).innerHTML = '<p>Failed to load content.</p>';
-                    });
             }
 
-            // Example of loading initial dashboard data
-            const newJobs = [{ title: 'Software Engineer', company: 'Tech Co' }, { title: 'Data Analyst', company: 'Data Corp' }];
-            const applicationStatuses = [{ job: 'Software Engineer', company: 'Tech Co', status: 'Under Review' }, { job: 'Marketing Manager', company: 'Global Inc', status: 'Submitted' }];
-            const savedJobsData = [{ title: 'Product Manager', company: 'Innovate Ltd' }];
-            const recommendedJobsData = [{ title: 'Frontend Developer', company: 'Web Solutions' }];
-            const recentActivityData = ['Saved job at Innovate Ltd', 'Applied for Software Engineer at Tech Co'];
-            const followedCompaniesData = ['Tech Co', 'Innovate Ltd'];
-
-            const newJobCount = document.getElementById('new-job-count');
-            const newJobList = document.getElementById('new-job-list');
-            const applicationStatusList = document.getElementById('application-status-list');
-            const savedJobCount = document.getElementById('saved-job-count');
-            const savedJobList = document.getElementById('saved-job-list');
-            const recommendedJobList = document.getElementById('recommended-job-list');
-            const recentActivityList = document.getElementById('recent-activity-list');
-            const followedCompaniesList = document.getElementById('followed-companies-list');
-
-            if (newJobCount) newJobCount.textContent = newJobs.length;
-            if (newJobList) newJobs.forEach(job => { 
-                const li = document.createElement('li'); 
-                li.textContent = `${job.title} at ${job.company}`; 
-                newJobList.appendChild(li); 
-            });
-
+            // Search functionality
             document.querySelector('.search-button').addEventListener('click', function() {
                 const keyword = document.querySelector('.search-input').value;
                 const location = document.querySelector('.location-input').value;
-                // Implement search functionality
-                console.log('Searching for:', keyword, 'in', location);
+                window.location.href = `/jobs?search=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}`;
             });
         });
     </script>

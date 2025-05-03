@@ -22,30 +22,30 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const connectDB = async () => {
-    try {
-        if (!process.env.MONGO_URI) {
-            throw new Error('MongoDB connection string is not defined in environment variables');
-        }
-
-        const conn = await mongoose.connect(process.env.MONGO_URI, {
-            // These options are no longer needed in Mongoose 6+
-            // but kept here for compatibility with older versions
-            useNewUrlParser: true,
+  try {
+        const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/jobportal';
+        console.log('Attempting to connect to MongoDB...');
+        const conn = await mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
             useUnifiedTopology: true
         });
 
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
         logger.info(`MongoDB Connected: ${conn.connection.host}`);
 
         // Handle connection events
         mongoose.connection.on('connected', () => {
+            console.log('Mongoose connected to MongoDB');
             logger.info('Mongoose connected to MongoDB');
         });
 
         mongoose.connection.on('error', (err) => {
+            console.error('Mongoose connection error:', err);
             logger.error('Mongoose connection error:', err);
         });
 
         mongoose.connection.on('disconnected', () => {
+            console.log('Mongoose disconnected from MongoDB');
             logger.info('Mongoose disconnected from MongoDB');
         });
 
@@ -58,10 +58,11 @@ const connectDB = async () => {
 
         return conn;
     } catch (error) {
+        console.error('MongoDB connection error:', error);
         logger.error('MongoDB connection error:', error);
         // Exit with failure
-        process.exit(1);
-    }
+    process.exit(1);
+  }
 };
 
 module.exports = connectDB;

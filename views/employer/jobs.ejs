@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        .jobs-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .jobs-header {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .job-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .job-form {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+        }
+        .form-control {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 0.75rem;
+        }
+        .form-control:focus {
+            border-color: #facc15;
+            box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.25);
+        }
+        .btn-primary {
+            background-color: #facc15;
+            color: #111;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #eab308;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .status-active {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .status-closed {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+
+    <div class="jobs-container">
+        <div class="jobs-header">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Manage Jobs</h1>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#jobModal">
+                    <i class="fas fa-plus"></i> Post New Job
+                </button>
+            </div>
+        </div>
+
+        <% if (locals.flash) { %>
+            <% if (flash.success) { %>
+                <div class="alert alert-success">
+                    <%= flash.success %>
+                </div>
+            <% } %>
+            <% if (flash.error) { %>
+                <div class="alert alert-danger">
+                    <%= flash.error %>
+                </div>
+            <% } %>
+        <% } %>
+
+        <div class="job-list">
+            <% if (jobs.length > 0) { %>
+                <% jobs.forEach(job => { %>
+                    <div class="job-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 class="mb-2"><%= job.title %></h3>
+                                <p class="text-muted mb-2"><%= job.companyName %></p>
+                                <div class="d-flex gap-3 mb-2">
+                                    <span><i class="fas fa-map-marker-alt"></i> <%= job.location %></span>
+                                    <span><i class="fas fa-briefcase"></i> <%= job.type %></span>
+                                    <span><i class="fas fa-dollar-sign"></i> <%= job.salary %></span>
+                                </div>
+                                <p class="mb-0"><%= job.description.substring(0, 200) %>...</p>
+                            </div>
+                            <div class="text-end">
+                                <span class="status-badge status-<%= job.status %>">
+                                    <%= job.status.charAt(0).toUpperCase() + job.status.slice(1) %>
+                                </span>
+                                <div class="mt-2">
+                                    <a href="/employer/jobs/<%= job._id %>/edit" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="/employer/jobs/<%= job._id %>/applications" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-users"></i> Applications
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="text-center py-5">
+                    <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                    <h3>No Jobs Posted Yet</h3>
+                    <p class="text-muted">Start by posting your first job opening</p>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#jobModal">
+                        Post a Job
+                    </button>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Job Posting Modal -->
+    <div class="modal fade" id="jobModal" tabindex="-1" aria-labelledby="jobModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="jobModalLabel">Post New Job</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/employer/jobs" method="POST">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="title" class="form-label">Job Title</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="type" class="form-label">Job Type</label>
+                                <select class="form-control" id="type" name="type" required>
+                                    <option value="Full-time">Full-time</option>
+                                    <option value="Part-time">Part-time</option>
+                                    <option value="Contract">Contract</option>
+                                    <option value="Internship">Internship</option>
+                                    <option value="Remote">Remote</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="location" class="form-label">Location</label>
+                                <input type="text" class="form-control" id="location" name="location" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="salary" class="form-label">Salary</label>
+                                <input type="text" class="form-control" id="salary" name="salary" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Job Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="requirements" class="form-label">Requirements</label>
+                            <textarea class="form-control" id="requirements" name="requirements" rows="5" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="benefits" class="form-label">Benefits</label>
+                            <textarea class="form-control" id="benefits" name="benefits" rows="3"></textarea>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="experience" class="form-label">Experience Required</label>
+                                <input type="text" class="form-control" id="experience" name="experience" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="education" class="form-label">Education Required</label>
+                                <input type="text" class="form-control" id="education" name="education" required>
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Post Job</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

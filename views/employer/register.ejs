@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Employer Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f9fafb; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .register-container { background: white; padding: 2rem 2.5rem; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 450px; }
+        h2 { text-align: center; color: #222; margin-bottom: 1.5rem; }
+        form { display: flex; flex-direction: column; }
+        input, select, textarea { margin-bottom: 1rem; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid #ddd; border-radius: 0.5rem; }
+        button { padding: 0.75rem 1rem; font-size: 1rem; border: none; border-radius: 0.5rem; background-color: #facc15; color: #111; font-weight: 600; cursor: pointer; }
+        button:hover { background-color: #eab308; }
+        .error-message { color: red; font-size: 0.9rem; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h2>Employer Registration</h2>
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
+        <form action="/employer/register" method="POST">
+            <input type="text" name="companyName" placeholder="Company Name" required />
+            <input type="email" name="email" placeholder="Contact Email" required />
+            <input type="password" name="password" placeholder="Password" required />
+            <textarea name="companyDescription" placeholder="Company Description" rows="3" required></textarea>
+            <input type="text" name="industry" placeholder="Industry" required />
+            <select name="companySize" required>
+                <option value="">Select Company Size</option>
+                <option value="1-10">1-10 employees</option>
+                <option value="11-50">11-50 employees</option>
+                <option value="51-200">51-200 employees</option>
+                <option value="201-500">201-500 employees</option>
+                <option value="501-1000">501-1000 employees</option>
+                <option value="1000+">1000+ employees</option>
+            </select>
+            <input type="text" name="location" placeholder="Location" required />
+            <input type="tel" name="contactPhone" placeholder="Contact Phone" />
+            <button type="submit">Register as Employer</button>
+        </form>
+        <p style="text-align:center;margin-top:1rem;">Already have an account? <a href="/employer/login">Login here</a></p>
+    </div>
+</body>
+</html> 
