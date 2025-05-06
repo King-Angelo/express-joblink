@@ -6,6 +6,44 @@ const JobApplication = require('../models/JobApplication');
 const { authMiddleware } = require('../middleware/authMiddleware');
 const Job = require('../models/Job');
 
+// Middleware to check user type
+const checkUserType = (req, res, next) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+    next();
+};
+
+// Jobseeker Dashboard
+router.get('/', checkUserType, (req, res) => {
+    if (req.session.user.userType !== 'jobseeker') {
+        return res.redirect(`/${req.session.user.userType}/dashboard`);
+    }
+    res.render('dashboard', {
+        firstName: req.session.user.firstName
+    });
+});
+
+// Agency Dashboard
+router.get('/agency/dashboard', checkUserType, (req, res) => {
+    if (req.session.user.userType !== 'agency') {
+        return res.redirect('/dashboard');
+    }
+    res.render('agency/dashboard', {
+        agencyName: req.session.user.agencyName
+    });
+});
+
+// Employer Dashboard
+router.get('/employer/dashboard', checkUserType, (req, res) => {
+    if (req.session.user.userType !== 'employer') {
+        return res.redirect('/dashboard');
+    }
+    res.render('employer/dashboard', {
+        firstName: req.session.user.firstName
+    });
+});
+
 // Middleware to check if user is authenticated
 const isAuthenticated = (req, res, next) => {
     if (req.session.userId) {

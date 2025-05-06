@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Agency Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #fefefe;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .steps-container {
+      display: flex;
+      margin-bottom: 2rem;
+      justify-content: space-between;
+    }
+
+    .step {
+      flex: 1;
+      text-align: center;
+      padding: 1rem;
+      background: #f3f4f6;
+      margin: 0 0.5rem;
+      border-radius: 0.5rem;
+      position: relative;
+    }
+
+    .step.active {
+      background: #facc15;
+      color: #111;
+    }
+
+    .step.completed {
+      background: #10b981;
+      color: white;
+    }
+
+    .step-content {
+      display: none;
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .step-content.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      background: #facc15;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 1rem;
+    }
+
+    button:hover {
+      background: #eab308;
+    }
+
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Create Your Agency Profile</h1>
+    
+    <div class="steps-container">
+      <div class="step active" data-step="1">Basic Information</div>
+      <div class="step" data-step="2">Company Details</div>
+      <div class="step" data-step="3">Services & Specialties</div>
+      <div class="step" data-step="4">Contact Information</div>
+    </div>
+
+    <form id="agencyForm" action="/agency/create" method="POST">
+      <!-- Step 1: Basic Information -->
+      <div class="step-content active" data-step="1">
+        <div class="form-group">
+          <label for="agencyName">Agency Name</label>
+          <input type="text" id="agencyName" name="agencyName" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+      </div>
+
+      <!-- Step 2: Company Details -->
+      <div class="step-content" data-step="2">
+        <div class="form-group">
+          <label for="companyType">Company Type</label>
+          <select id="companyType" name="companyType" required>
+            <option value="">Select Type</option>
+            <option value="recruitment">Recruitment Agency</option>
+            <option value="staffing">Staffing Agency</option>
+            <option value="consulting">Consulting Firm</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="description">Company Description</label>
+          <textarea id="description" name="description" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="foundedYear">Year Founded</label>
+          <input type="number" id="foundedYear" name="foundedYear" required>
+        </div>
+      </div>
+
+      <!-- Step 3: Services & Specialties -->
+      <div class="step-content" data-step="3">
+        <div class="form-group">
+          <label>Services Offered</label>
+          <div>
+            <input type="checkbox" id="permanent" name="services" value="permanent">
+            <label for="permanent">Permanent Placement</label>
+          </div>
+          <div>
+            <input type="checkbox" id="contract" name="services" value="contract">
+            <label for="contract">Contract Staffing</label>
+          </div>
+          <div>
+            <input type="checkbox" id="executive" name="services" value="executive">
+            <label for="executive">Executive Search</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="specialties">Industry Specialties</label>
+          <textarea id="specialties" name="specialties" rows="4" required></textarea>
+        </div>
+      </div>
+
+      <!-- Step 4: Contact Information -->
+      <div class="step-content" data-step="4">
+        <div class="form-group">
+          <label for="address">Address</label>
+          <input type="text" id="address" name="address" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" required>
+        </div>
+        <div class="form-group">
+          <label for="website">Website</label>
+          <input type="url" id="website" name="website">
+        </div>
+      </div>
+
+      <div class="navigation-buttons">
+        <button type="button" id="prevBtn" style="display: none;">Previous</button>
+        <button type="button" id="nextBtn">Next</button>
+        <button type="submit" id="submitBtn" style="display: none;">Submit</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    const totalSteps = 4;
+
+    function updateStepDisplay() {
+      document.querySelectorAll('.step').forEach((step, index) => {
+        if (index + 1 === currentStep) {
+          step.classList.add('active');
+          step.classList.remove('completed');
+        } else if (index + 1 < currentStep) {
+          step.classList.remove('active');
+          step.classList.add('completed');
+        } else {
+          step.classList.remove('active', 'completed');
+        }
+      });
+
+      document.querySelectorAll('.step-content').forEach(content => {
+        content.classList.toggle('active', parseInt(content.dataset.step) === currentStep);
+      });
+
+      document.getElementById('prevBtn').style.display = currentStep > 1 ? 'block' : 'none';
+      document.getElementById('nextBtn').style.display = currentStep < totalSteps ? 'block' : 'none';
+      document.getElementById('submitBtn').style.display = currentStep === totalSteps ? 'block' : 'none';
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      if (currentStep < totalSteps) {
+        currentStep++;
+        updateStepDisplay();
+      }
+    });
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      if (currentStep > 1) {
+        currentStep--;
+        updateStepDisplay();
+      }
+    });
+
+    updateStepDisplay();
+  </script>
+</body>
+</html> 

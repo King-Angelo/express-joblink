@@ -404,8 +404,13 @@
             <a href="/salary-guide">Salary Guide</a>
         </div>
         <div class="auth-buttons">
-            <a href="/login" class="btn btn-outline">Job Seeker</a>
-            <a href="/employer/login" class="btn btn-primary">Employer</a>
+            <% if (user) { %>
+                <form action="/auth/logout" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-outline">Sign Out</button>
+                </form>
+            <% } else { %>
+                <a href="/login" class="btn btn-primary">Sign In</a>
+            <% } %>
         </div>
     </nav>
 

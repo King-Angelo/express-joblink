@@ -93,103 +93,142 @@ app.use("/profile", profileRoutes);
 app.use("/job-alerts", authMiddleware, jobAlertRoutes);
 app.use("/employer", employerRoutes);
 app.use("/", pageRoutes);
+app.use('/dev', require('./routes/dev'));
 
 // Login route
 app.post("/login", async (req, res) => {
     console.log('Processing login attempt:', req.body);
-    const { email, password } = req.body;
+    const { email, password, userType } = req.body;
 
     try {
-        // Find user by email
-        const user = await User.findOne({ email });
+        // Find user by email and userType
+        const user = await User.findOne({ email, userType });
         
-        // Check if user exists and password matches
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.render("login", { error: "Invalid email or password" });
+        if (!user) {
+            return res.render('login', { 
+                error: 'Invalid email or user type' 
+            });
         }
 
-        // Set session
-        req.session.userId = user._id;
-        await req.session.save();
+        // Check password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.render('login', { 
+                error: 'Invalid password' 
+            });
+        }
 
-        // Set JWT token
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'your-secret-key', { expiresIn: "24h" });
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        // Create session
+        req.session.user = {
+            id: user._id,
+            email: user.email,
+            firstName: user.firstName,
+            userType: user.userType,
+            agencyName: user.agencyName
+        };
+
+        // Redirect based on user type
+        switch (userType) {
+            case 'jobseeker':
+                res.redirect('/dashboard');
+                break;
+            case 'agency':
+                res.redirect('/agency/dashboard');
+                break;
+            case 'employer':
+                res.redirect('/employer/dashboard');
+                break;
+            default:
+                res.redirect('/dashboard');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        res.render('login', { 
+            error: 'An error occurred during login' 
         });
-
-        // Redirect to dashboard
-        return res.redirect('/dashboard');
-    } catch (err) {
-        console.error('Login error:', err);
-        return res.render("login", { error: "Something went wrong" });
     }
 });
 
 // Register routes
-app.get("/register", (req, res) => {
-    console.log('Handling register route');
+app.get("/register/:type", (req, res) => {
+    const { type } = req.params;
+    if (!['jobseeker', 'agency', 'employee'].includes(type)) {
+        return res.redirect('/register/jobseeker');
+    }
+
     try {
-        // If user is already logged in, redirect to dashboard
+        // If user is already logged in, redirect to appropriate dashboard
         if (req.session.userId) {
-            return res.redirect('/dashboard');
+            return res.redirect(`/${req.session.userType}/dashboard`);
         }
-        res.render("register", { error: null });
+
+        if (type === 'agency') {
+            res.render("agency-profile", { error: null });
+        } else {
+            res.render("register", { error: null, userType: type });
+        }
     } catch (err) {
         console.error('Error rendering register:', err);
         res.status(500).send('Error rendering register page');
     }
 });
 
-app.post("/register", async (req, res) => {
-    console.log('Registration attempt:', req.body);
-    const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-        return res.render("register", { error: "All fields are required" });
-    }
+// Agency registration route
+app.post("/register/agency", async (req, res) => {
+    console.log('Agency registration attempt:', req.body);
+    const { agencyName, email, password, companyType, description, foundedYear, services, specialties, address, phone, website } = req.body;
 
     try {
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            console.log('User already exists:', email);
-            return res.render("register", { error: "Email already registered" });
+            return res.render("agency-profile", { error: "Email already registered" });
         }
 
-        // Create new user
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // Create new agency user
         const user = new User({
-            name,
             email,
-            password: hashedPassword
+            password,
+            userType: 'agency',
+            agencyProfile: {
+                agencyName,
+                companyType,
+                description,
+                foundedYear,
+                services: Array.isArray(services) ? services : [services],
+                specialties,
+                address,
+                phone,
+                website
+            }
         });
 
         await user.save();
-        console.log('User created:', user._id);
+        console.log('Agency user created:', user._id);
 
         // Set session
         req.session.userId = user._id;
+        req.session.userType = 'agency';
         await req.session.save();
-        console.log('Session after registration:', req.session);
 
         // Set JWT token
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign(
+            { id: user._id, userType: 'agency' },
+            process.env.JWT_SECRET,
+            { expiresIn: "24h" }
+        );
         res.cookie('token', token, {
             httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            maxAge: 3600000 // 1 hour
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000
         });
 
-        return res.redirect('/dashboard');
+        return res.redirect('/agency/dashboard');
     } catch (err) {
-        console.error('Registration error:', err);
-        return res.render("register", { 
+        console.error('Agency registration error:', err);
+        return res.render("agency-profile", { 
             error: "Registration failed. Please try again.",
-            name: name,
-            email: email
+            formData: req.body
         });
     }
 });

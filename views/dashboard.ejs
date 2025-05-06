@@ -3,414 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JobLink Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Jobseeker Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #facc15;
+            --primary-dark: #eab308;
+            --secondary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            margin: 0;
-            background-color: #f9f9f9;
-            font-size: 16px;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Center the main content */
+            background: var(--gray-100);
+            color: var(--gray-900);
         }
-        .top-bar {
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            padding: 1.5rem;
+            border-right: 1px solid var(--gray-200);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 2rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            color: var(--gray-700);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: var(--gray-900);
+        }
+
+        .nav-item i {
+            margin-right: 0.75rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+        }
+
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
-            background-color: #fff;
-            border-bottom: 1px solid #ddd;
-            width: 100%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 100;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-        }
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .nav-link {
-            color: #666;
-            text-decoration: none;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 10px;
-            border-radius: 5px;
-            transition: color 0.2s;
-        }
-        .nav-link:hover {
-            color: #007bff;
-        }
-        .nav-link i {
-            font-size: 1rem;
-        }
-        #main-content {
-            margin-top: 70px; /* Adjust margin */
-            width: 80%;
-            max-width: 960px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: 'Inter', sans-serif; /* Apply font here as well */
+            margin-bottom: 2rem;
         }
 
-        /* Styling for the search area within main-content */
-        .search-area {
-            width: 100%;
-            max-width: 650px;
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .welcome {
+            font-size: 1.5rem;
+            font-weight: 600;
         }
-        .search-container {
-            display: flex;
-            width: 100%;
-            border-radius: 5px;
-            overflow: hidden;
-            border: 1px solid #ccc;
-        }
-        .search-input {
-            padding: 12px;
-            border: none;
-            flex-grow: 2; /* Give more weight to the keyword input */
-            font-size: 1.1em;
-        }
-        .location-input-wrapper {
+
+        .search-bar {
             display: flex;
             align-items: center;
-            border-left: 1px solid #ccc;
-            padding: 12px 8px; /* Reduced right padding */
-            font-size: 1.1em;
-            flex-grow: 1; /* Let it take some space but less than keywords */
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .location-input-wrapper i {
-            margin-right: 5px; /* Slightly reduced icon margin */
-            color: #777;
-        }
-        .location-input {
+
+        .search-bar input {
             border: none;
-            flex-grow: 1;
-            font-size: 1.1em;
             outline: none;
-        }
-        .search-button {
-            padding: 12px 8px; /* Further reduced horizontal padding */
-            border: none;
-            background-color: #facc15;
-            color: #111;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.9em; /* Further reduced font size */
-            white-space: nowrap;
-        }
-        .search-button:hover {
-            background-color: #eab308; /* Darker yellow on hover */
+            padding: 0.5rem;
+            width: 300px;
         }
 
-        .cards-container {
+        /* Job Search */
+        .job-search {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-filters {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjust min width */
-            gap: 20px;
-            margin-top: 20px; /* Space between search and cards */
-            width: 100%; /* Take full width of main content */
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
-        .card {
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 8px; /* More rounded corners for the box */
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
-            border: 1px solid #ddd; /* Subtle border */
-        }
-        .card h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            color: #222;
-            font-size: 18px;
-            font-weight: bold;
-            border-bottom: 2px solid #facc15; /* Yellow underline for title */
-            padding-bottom: 5px;
-        }
-        .card p {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 8px;
-        }
-        .card ul {
-            list-style: none;
-            padding: 0;
-            font-size: 14px;
-            color: #444;
-        }
-        .card ul li {
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .card ul li:last-child {
-            border-bottom: none;
-        }
-        .card .view-all {
-            display: block;
-            margin-top: 12px;
-            color: #facc15;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        /* Jobs Section Styles */
-        .jobs-list {
+        .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 15px;
         }
 
-        .job-item {
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            background-color: #fff;
+        .filter-group label {
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
         }
 
-        .job-item h4 {
-            margin: 0 0 5px 0;
-            color: #333;
-            font-size: 16px;
+        .filter-group select,
+        .filter-group input {
+            padding: 0.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 0.5rem;
         }
 
-        .job-item .company {
-            margin: 0 0 10px 0;
-            color: #666;
-            font-size: 14px;
+        /* Job Listings */
+        .job-listings {
+            display: grid;
+            gap: 1rem;
         }
 
-        .job-details {
+        .job-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .job-header {
             display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
-            font-size: 13px;
-            color: #666;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
         }
 
-        .job-details span {
+        .job-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .job-company {
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .job-meta {
             display: flex;
-            align-items: center;
-            gap: 5px;
+            gap: 1rem;
+            color: var(--gray-700);
+            font-size: 0.875rem;
         }
 
-        .job-skills {
+        .job-description {
+            margin: 1rem 0;
+            color: var(--gray-700);
+        }
+
+        .job-actions {
             display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-bottom: 10px;
+            gap: 1rem;
         }
 
-        .skill-badge {
-            background-color: #f0f0f0;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            color: #555;
-        }
-
-        .view-job-btn {
-            display: inline-block;
-            padding: 6px 12px;
-            background-color: #facc15;
-            color: #111;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 13px;
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
             font-weight: 500;
-            transition: background-color 0.2s;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .view-job-btn:hover {
-            background-color: #eab308;
+        .btn-primary {
+            background: var(--primary);
+            color: var(--gray-900);
         }
 
-        .recent-activity, .resources, .followed-companies {
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 8px; /* Box type */
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border: 1px solid #ddd;
-            margin-top: 20px; /* Space between sections */
-            width: 100%; /* Take full width of main content */
-            max-width: 960px; /* Adjust max width */
+        .btn-primary:hover {
+            background: var(--primary-dark);
         }
-        .recent-activity h3, .resources h3, .followed-companies h3 {
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 0;
-            margin-bottom: 10px;
-            color: #222;
-            border-bottom: 2px solid #facc15; /* Yellow underline */
-            padding-bottom: 5px;
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
         }
-        .recent-activity ul, .resources ul, .followed-companies ul {
-            list-style: none;
-            padding: 0;
-            font-size: 14px;
-            color: #444;
+
+        .btn-secondary:hover {
+            opacity: 0.9;
         }
-        .recent-activity ul li, .resources ul li, .followed-companies ul li {
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
+
+        /* Application Status */
+        .status-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
         }
-        .recent-activity ul li:last-child, .resources ul li:last-child, .followed-companies ul li:last-child {
-            border-bottom: none;
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
         }
-        .resources ul li a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
+
+        .status-card {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background: var(--gray-100);
+        }
+
+        .status-count {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-label {
+            color: var(--gray-700);
+            font-size: 0.875rem;
         }
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <a href="/" class="logo">
-            <img src="/images/logo.png" alt="JobLink Logo" height="40">
-        </a>
-        <div class="nav-links">
-            <a href="/dashboard" class="nav-link">
-                <i class="fas fa-th-large"></i> Dashboard
-            </a>
-            <a href="/profile" class="nav-link">
-                <i class="fas fa-user"></i> Profile
-            </a>
-            <a href="/saved-jobs" class="nav-link">
-                <i class="fas fa-heart"></i> Saved Jobs
-            </a>
-            <a href="/job-alerts" class="nav-link">
-                <i class="fas fa-bell"></i> Job Alerts
-            </a>
-            <a href="/contact" class="nav-link">
-                <i class="fas fa-envelope"></i> Contact
-            </a>
-            <form action="/api/auth/logout" method="POST" style="display: inline;">
-                <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer;">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </form>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">JobLink</div>
+            <nav>
+                <a href="/dashboard" class="nav-item active">
+                    <i>📊</i> Dashboard
+                </a>
+                <a href="/jobs" class="nav-item">
+                    <i>💼</i> Find Jobs
+                </a>
+                <a href="/applications" class="nav-item">
+                    <i>📝</i> Applications
+                </a>
+                <a href="/saved-jobs" class="nav-item">
+                    <i>🔖</i> Saved Jobs
+                </a>
+                <a href="/profile" class="nav-item">
+                    <i>👤</i> Profile
+                </a>
+                <a href="/settings" class="nav-item">
+                    <i>⚙️</i> Settings
+                </a>
+            </nav>
         </div>
-    </div>
 
-    <div id="main-content">
-        <div class="search-area">
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Job title, keywords, or company">
-                <div class="location-input-wrapper">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <input type="text" class="location-input" placeholder="Location" value="Manila">
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="welcome">Welcome back, <%= firstName %></div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search jobs...">
                 </div>
-                <button class="search-button">Find Jobs</button>
             </div>
-        </div>
 
-        <div class="cards-container">
-            <!-- Jobs Section -->
-            <div class="card">
-                <h3>Available Jobs</h3>
-                <div class="jobs-list">
-                    <% if (jobs && jobs.length > 0) { %>
-                        <% jobs.forEach(job => { %>
-                            <div class="job-item">
-                                <h4><%= job.title %></h4>
-                                <p class="company"><%= job.company %></p>
-                                <div class="job-details">
-                                    <span><i class="fas fa-map-marker-alt"></i> <%= job.location %></span>
-                                    <span><i class="fas fa-briefcase"></i> <%= job.type %></span>
-                                    <span><i class="fas fa-money-bill-wave"></i> <%= job.salary %></span>
-                                </div>
-                                <div class="job-skills">
-                                    <% job.skills.forEach(skill => { %>
-                                        <span class="skill-badge"><%= skill %></span>
-                                    <% }) %>
-                                </div>
-                                <a href="/jobs/<%= job._id %>" class="view-job-btn">View Details</a>
+            <!-- Application Status -->
+            <div class="status-section">
+                <div class="status-grid">
+                    <div class="status-card">
+                        <div class="status-count">12</div>
+                        <div class="status-label">Total Applications</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-count">3</div>
+                        <div class="status-label">Interviews</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-count">5</div>
+                        <div class="status-label">Under Review</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-count">4</div>
+                        <div class="status-label">Saved Jobs</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job Search -->
+            <div class="job-search">
+                <div class="search-filters">
+                    <div class="filter-group">
+                        <label>Job Title</label>
+                        <input type="text" placeholder="e.g. Software Engineer">
+                    </div>
+                    <div class="filter-group">
+                        <label>Location</label>
+                        <input type="text" placeholder="e.g. New York">
+                    </div>
+                    <div class="filter-group">
+                        <label>Job Type</label>
+                        <select>
+                            <option value="">All Types</option>
+                            <option value="full-time">Full Time</option>
+                            <option value="part-time">Part Time</option>
+                            <option value="contract">Contract</option>
+                            <option value="remote">Remote</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary">Search Jobs</button>
+            </div>
+
+            <!-- Job Listings -->
+            <div class="job-listings">
+                <div class="job-card">
+                    <div class="job-header">
+                        <div>
+                            <div class="job-title">Senior Frontend Developer</div>
+                            <div class="job-company">TechCorp Inc.</div>
+                            <div class="job-meta">
+                                <span>📍 Remote</span>
+                                <span>💰 $120k - $150k</span>
+                                <span>⏰ Full Time</span>
                             </div>
-                        <% }) %>
-                    <% } else { %>
-                        <p>No jobs available at the moment.</p>
-                    <% } %>
+                        </div>
+                        <button class="btn btn-secondary">Apply Now</button>
+                    </div>
+                    <div class="job-description">
+                        We're looking for a Senior Frontend Developer with 5+ years of experience in React and TypeScript...
+                    </div>
+                    <div class="job-actions">
+                        <button class="btn btn-secondary">Save Job</button>
+                        <button class="btn btn-secondary">View Details</button>
+                    </div>
                 </div>
-                <a href="/jobs" class="view-all">View All Jobs →</a>
-            </div>
 
-            <div class="card">
-                <h3>Recommended Jobs</h3>
-                <ul id="recommended-job-list">
-                </ul>
-                <a href="/jobs/recommended" class="view-all">View All Recommendations</a>
-            </div>
-
-            <div class="card">
-                <h3>Recent Activity</h3>
-                <% if (typeof recentActivity !== 'undefined' && recentActivity.length > 0) { %>
-                    <ul style="list-style: none; padding: 0;">
-                        <% recentActivity.forEach(activity => { %>
-                            <li style="margin: 10px 0; padding: 10px; border: 1px solid #eee; border-radius: 5px;">
-                                <%= activity %>
-                            </li>
-                        <% }); %>
-                </ul>
-                <% } else { %>
-                    <p>No recent activity</p>
-                <% } %>
+                <div class="job-card">
+                    <div class="job-header">
+                        <div>
+                            <div class="job-title">Backend Engineer</div>
+                            <div class="job-company">DataSystems Ltd.</div>
+                            <div class="job-meta">
+                                <span>📍 New York</span>
+                                <span>💰 $100k - $130k</span>
+                                <span>⏰ Full Time</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary">Apply Now</button>
+                    </div>
+                    <div class="job-description">
+                        Join our team as a Backend Engineer to work on scalable systems and microservices architecture...
+                    </div>
+                    <div class="job-actions">
+                        <button class="btn btn-secondary">Save Job</button>
+                        <button class="btn btn-secondary">View Details</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const mainContent = document.getElementById('main-content');
-            const recommendedJobList = document.getElementById('recommended-job-list');
-
-            // Example recommended jobs data
-            const recommendedJobsData = [
-                { title: 'Frontend Developer', company: 'Web Solutions' },
-                { title: 'Software Engineer', company: 'Tech Co' },
-                { title: 'Data Analyst', company: 'Data Corp' }
-            ];
-
-            // Populate recommended jobs
-            if (recommendedJobList) {
-                recommendedJobsData.forEach(job => {
-                    const li = document.createElement('li');
-                    li.textContent = `${job.title} at ${job.company}`;
-                    recommendedJobList.appendChild(li);
-                });
-            }
-
-            // Search functionality
-            document.querySelector('.search-button').addEventListener('click', function() {
-                const keyword = document.querySelector('.search-input').value;
-                const location = document.querySelector('.location-input').value;
-                window.location.href = `/jobs?search=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}`;
-            });
-        });
-    </script>
 </body>
 </html>

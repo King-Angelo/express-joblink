@@ -2,73 +2,96 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
-
+// Register a new user
+exports.register = async (req, res) => {
   try {
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ msg: "User already exists" });
+    const { userType, email, password, ...rest } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already registered' });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    user = new User({
-      name,
+    // Create new user based on type
+    const user = new User({
       email,
-      password: hashedPassword,
+      password,
+      userType,
+      ...rest
     });
 
+    // Save user
     await user.save();
 
-    const payload = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    };
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id, userType: user.userType },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+    res.status(201).json({
+      message: 'Registration successful',
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        userType: user.userType
+      }
     });
-
-    res.status(201).json({ token });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
+  } catch (error) {
+    res.status(500).json({ error: 'Registration failed', details: error.message });
   }
 };
 
-const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
+// Login user
+exports.login = async (req, res) => {
   try {
-    const user = await User.findOne({ email });
-    if (!user)
-      return res.status(400).json({ msg: "Invalid credentials (email)" });
+    const { email, password, userType } = req.body;
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ msg: "Invalid credentials (password)" });
+    // Find user
+    const user = await User.findOne({ email, userType });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
-    const payload = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    };
+    // Check password
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id, userType: user.userType },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        userType: user.userType
+      }
     });
-
-    res.status(200).json({ token });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
+  } catch (error) {
+    res.status(500).json({ error: 'Login failed', details: error.message });
   }
 };
 
-module.exports = {
-  registerUser,
-  loginUser,
+// Get current user
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get user', details: error.message });
+  }
 };
