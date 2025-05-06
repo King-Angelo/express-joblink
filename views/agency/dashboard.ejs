@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agency Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #facc15;
+      --primary-dark: #eab308;
+      --secondary: #3b82f6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-700: #374151;
+      --gray-900: #111827;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--gray-100);
+      color: var(--gray-900);
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: white;
+      padding: 1.5rem;
+      border-right: 1px solid var(--gray-200);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 2rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
+      color: var(--gray-700);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      background: var(--gray-100);
+      color: var(--gray-900);
+    }
+
+    .nav-item.active {
+      background: var(--primary);
+      color: var(--gray-900);
+    }
+
+    .nav-item i {
+      margin-right: 0.75rem;
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 2rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .welcome {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .search-bar input {
+      border: none;
+      outline: none;
+      padding: 0.5rem;
+      width: 300px;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .stat-title {
+      color: var(--gray-700);
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    /* Recent Activity */
+    .section {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .activity-list {
+      list-style: none;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gray-100);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+    }
+
+    .activity-details {
+      flex: 1;
+    }
+
+    .activity-title {
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .activity-time {
+      color: var(--gray-700);
+      font-size: 0.875rem;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--gray-900);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">JobLink</div>
+      <nav>
+        <a href="/agency/dashboard" class="nav-item active">
+          <i>📊</i> Dashboard
+        </a>
+        <a href="/agency/jobs" class="nav-item">
+          <i>💼</i> Jobs
+        </a>
+        <a href="/agency/candidates" class="nav-item">
+          <i>👥</i> Candidates
+        </a>
+        <a href="/agency/clients" class="nav-item">
+          <i>🏢</i> Clients
+        </a>
+        <a href="/agency/reports" class="nav-item">
+          <i>📈</i> Reports
+        </a>
+        <a href="/agency/settings" class="nav-item">
+          <i>⚙️</i> Settings
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="header">
+        <div class="welcome">Welcome back, <%= agencyName %></div>
+        <div class="search-bar">
+          <input type="text" placeholder="Search...">
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Active Jobs</div>
+          <div class="stat-value">24</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Total Candidates</div>
+          <div class="stat-value">156</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Interviews This Week</div>
+          <div class="stat-value">8</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Placements This Month</div>
+          <div class="stat-value">5</div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="section">
+        <div class="section-title">Recent Activity</div>
+        <ul class="activity-list">
+          <li class="activity-item">
+            <div class="activity-icon">📝</div>
+            <div class="activity-details">
+              <div class="activity-title">New job posted: Senior Developer</div>
+              <div class="activity-time">2 hours ago</div>
+            </div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-icon">👥</div>
+            <div class="activity-details">
+              <div class="activity-title">3 new candidates applied</div>
+              <div class="activity-time">5 hours ago</div>
+            </div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-icon">✅</div>
+            <div class="activity-details">
+              <div class="activity-title">Candidate placed: John Doe</div>
+              <div class="activity-time">Yesterday</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="section">
+        <div class="section-title">Quick Actions</div>
+        <div style="display: flex; gap: 1rem;">
+          <button class="btn btn-primary">Post New Job</button>
+          <button class="btn btn-secondary">Add New Client</button>
+          <button class="btn btn-secondary">Schedule Interview</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

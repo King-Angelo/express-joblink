@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require('bcryptjs');
 
 const ExperienceSchema = new mongoose.Schema({
     title: {
@@ -49,74 +50,121 @@ const EducationSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-        required: [true, 'Name is required'],
-    trim: true,
-        minlength: [2, 'Name must be at least 2 characters long']
-  },
   email: {
     type: String,
-        required: [true, 'Email is required'],
+    required: true,
     unique: true,
-    lowercase: true,
     trim: true,
-        match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
+    lowercase: true
   },
   password: {
     type: String,
-        required: [true, 'Password is required'],
-        minlength: [6, 'Password must be at least 6 characters long']
+    required: true
+  },
+  userType: {
+    type: String,
+    required: true,
+    enum: ['jobseeker', 'agency', 'employer']
+  },
+  // Common fields for all user types
+  firstName: String,
+  lastName: String,
+  phone: String,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  // Agency specific fields
+  agencyProfile: {
+    agencyName: String,
+    companyType: {
+      type: String,
+      enum: ['recruitment', 'staffing', 'consulting']
     },
-    title: {
-        type: String,
-        trim: true
-    },
-    bio: {
-        type: String,
-        trim: true
-    },
-    location: {
-        type: String,
-        trim: true
-    },
-    phone: {
-        type: String,
-        trim: true
-    },
-    linkedin: {
-        type: String,
-        trim: true
-    },
-    skills: {
-        type: [String],
-        default: []
-    },
-    preferredJobTypes: {
-        type: [String],
-        default: []
-    },
-    preferredLocations: {
-        type: [String],
-        default: []
-    },
-    expectedSalary: {
-        type: String,
-        trim: true
-    },
+    description: String,
+    foundedYear: Number,
+    services: [{
+      type: String,
+      enum: ['permanent', 'contract', 'executive']
+    }],
+    specialties: String,
+    address: String,
+    website: String
+  },
+  // Jobseeker specific fields
+  jobseekerProfile: {
+    skills: [String],
     experience: [ExperienceSchema],
-    education: [EducationSchema],
-    profileImage: {
-        type: String,
-        default: '/images/default-avatar.png'
+    education: [EducationSchema]
+  },
+  // Employer specific fields
+  employerProfile: {
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Agency'
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
+    position: String,
+    department: String
+  },
+  title: {
+    type: String,
+    trim: true
+  },
+  bio: {
+    type: String,
+    trim: true
+  },
+  location: {
+    type: String,
+    trim: true
+  },
+  linkedin: {
+    type: String,
+    trim: true
+  },
+  preferredJobTypes: {
+    type: [String],
+    default: []
+  },
+  preferredLocations: {
+    type: [String],
+    default: []
+  },
+  expectedSalary: {
+    type: String,
+    trim: true
+  },
+  profileImage: {
+    type: String,
+    default: '/images/default-avatar.png'
+  }
 }, { timestamps: true });
 
 // Add index on email field
 UserSchema.index({ email: 1 }, { unique: true });
 
-module.exports = mongoose.model("User", UserSchema);
+// Hash password before saving
+UserSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Method to compare password
+UserSchema.methods.comparePassword = async function(candidatePassword) {
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    throw error;
+  }
+};
+
+const User = mongoose.model("User", UserSchema);
+
+module.exports = User;
