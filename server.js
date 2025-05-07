@@ -76,6 +76,35 @@ if (process.env.NODE_ENV !== 'production') {
     });
 }
 
+app.get("/register", (req, res) => {
+    console.log("--- /register route hit (rendering register-options) ---");
+    res.render("register-options");
+});
+
+app.get("/register/:type", (req, res) => {
+    console.log("--- /register/:type route hit ---");
+    const { type } = req.params;
+    console.log("req.params.type:", type);
+    
+    if (!["jobseeker", "agency", "employer"].includes(type)) {
+        console.log("Invalid type, redirecting to /register");
+        return res.redirect("/register");
+    }
+
+    if (req.session.userId) {
+        console.log("User logged in, redirecting to dashboard");
+        return res.redirect(`/${req.session.userType}/dashboard`);
+    }
+
+    if (type === "agency") {
+        console.log("Rendering agency-profile for type:", type);
+        return res.render("agency-profile", { error: null, userType: type });
+    }
+    
+    console.log("Rendering register with userType:", type);
+    return res.render("register", { error: null, userType: type });
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/dashboard", authMiddleware, dashboardRoutes);
 app.use("/jobs", jobRoutes);
@@ -115,32 +144,8 @@ app.post("/login", async (req, res) => {
     }
 });
 
-app.get("/register", (req, res) => {
-    console.log("--- /register route hit (rendering register-options) ---");
+app.get("/register-options", (req, res) => {
     res.render("register-options");
-});
-
-
-app.get("/register/:type", (req, res) => {
-    console.log("--- /register/:type route hit ---");
-    const { type } = req.params;
-    console.log("req.params.type:", type);
-    if (!["jobseeker", "agency", "employer"].includes(type)) {
-        console.log("Invalid type, redirecting to /register/jobseeker");
-        return res.redirect("/register/jobseeker");
-    }
-
-    if (req.session.userId) {
-        console.log("User logged in, redirecting to dashboard");
-        return res.redirect(`/${req.session.userType}/dashboard`);
-    }
-
-    if (type === "agency") {
-        console.log("Rendering agency-profile for type:", type, { userType: type }); // Added log
-        return res.render("agency-profile", { error: null, userType: type });
-    }
-    console.log("Rendering register with userType:", type, { userType: type }); // Added log
-    return res.render("register", { error: null, userType: type });
 });
 
 app.post("/register/jobseeker", async (req, res) => {

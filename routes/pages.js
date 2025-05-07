@@ -36,21 +36,6 @@ router.get("/login", (req, res) => {
     }
 });
 
-// Register page
-router.get("/register", (req, res) => {
-    console.log('Handling register route');
-    try {
-        // If user is already logged in, redirect to dashboard
-        if (req.session.userId) {
-            return res.redirect('/dashboard');
-        }
-        res.render("register", { error: null });
-    } catch (err) {
-        console.error('Error rendering register:', err);
-        res.status(500).send('Error rendering register page');
-    }
-});
-
 // Contact page
 router.get("/contact", (req, res) => {
     console.log('Handling contact route');

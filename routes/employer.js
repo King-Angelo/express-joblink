@@ -252,7 +252,7 @@ router.post('/login', async (req, res) => {
 
 // Employer registration page
 router.get('/register', (req, res) => {
-    res.render('employer/register', { error: null });
+    res.redirect('/register/employer');
 });
 
 // Employer registration POST
