@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employer Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #facc15;
+            --primary-dark: #eab308;
+            --secondary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--gray-100); color: var(--gray-900); }
+        .dashboard { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+        .sidebar { background: white; padding: 1.5rem; border-right: 1px solid var(--gray-200); }
+        .logo { font-size: 1.5rem; font-weight: 600; color: var(--primary); margin-bottom: 2rem; }
+        .nav-item { display: flex; align-items: center; padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 0.5rem; color: var(--gray-700); text-decoration: none; transition: all 0.2s; }
+        .nav-item:hover { background: var(--gray-100); color: var(--gray-900); }
+        .nav-item.active { background: var(--primary); color: var(--gray-900); }
+        .nav-item i { margin-right: 0.75rem; }
+        .main-content { padding: 2rem; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .welcome { font-size: 1.5rem; font-weight: 600; }
+        .search-bar { display: flex; align-items: center; background: white; padding: 0.5rem 1rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .search-bar input { border: none; outline: none; padding: 0.5rem; width: 300px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-title { color: var(--gray-700); font-size: 0.875rem; margin-bottom: 0.5rem; }
+        .stat-value { font-size: 1.5rem; font-weight: 600; }
+        .job-postings { background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .section-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
+        .job-list { display: grid; gap: 1rem; }
+        .job-item { padding: 1rem; border: 1px solid var(--gray-200); border-radius: 0.5rem; }
+        .job-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+        .job-title { font-size: 1.125rem; font-weight: 600; }
+        .job-meta { display: flex; gap: 1rem; color: var(--gray-700); font-size: 0.875rem; margin-bottom: 0.5rem; }
+        .job-stats { display: flex; gap: 1rem; margin-top: 0.5rem; }
+        .stat { display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); font-size: 0.875rem; }
+        .applications { background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .application-list { display: grid; gap: 1rem; }
+        .application-item { padding: 1rem; border: 1px solid var(--gray-200); border-radius: 0.5rem; }
+        .candidate-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+        .candidate-name { font-weight: 600; }
+        .application-status { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 500; }
+        .status-new { background: var(--primary); color: var(--gray-900); }
+        .status-review { background: var(--secondary); color: white; }
+        .status-interview { background: var(--success); color: white; }
+        .candidate-meta { display: flex; gap: 1rem; color: var(--gray-700); font-size: 0.875rem; }
+        .btn { padding: 0.5rem 1rem; border-radius: 0.5rem; border: none; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: var(--gray-900); }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--secondary); color: white; }
+        .btn-secondary:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">JobLink</div>
+            <nav>
+                <a href="/employer/dashboard" class="nav-item active">
+                    <i>📊</i> Dashboard
+                </a>
+                <a href="/employer/jobs" class="nav-item">
+                    <i>💼</i> Job Postings
+                </a>
+                <a href="/employer/applications" class="nav-item">
+                    <i>📝</i> Applications
+                </a>
+                <a href="/employer/candidates" class="nav-item">
+                    <i>👥</i> Candidates
+                </a>
+                <a href="/employer/analytics" class="nav-item">
+                    <i>📈</i> Analytics
+                </a>
+                <a href="/employer/settings" class="nav-item">
+                    <i>⚙️</i> Settings
+                </a>
+                <a href="/signout" class="nav-item" style="color: var(--danger);">
+                    <i>🚪</i> Sign Out
+                </a>
+            </nav>
+        </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="welcome">Welcome back, <%= user?.firstName || 'Employer' %></div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search...">
+                </div>
+            </div>
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Active Jobs</div>
+                    <div class="stat-value">8</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">New Applications</div>
+                    <div class="stat-value">12</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Interviews Today</div>
+                    <div class="stat-value">3</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Hired This Month</div>
+                    <div class="stat-value">4</div>
+                </div>
+            </div>
+            <!-- Job Postings -->
+            <div class="job-postings">
+                <div class="section-title">Recent Job Postings</div>
+                <div class="job-list">
+                    <div class="job-item">
+                        <div class="job-header">
+                            <div class="job-title">Senior Frontend Developer</div>
+                            <button class="btn btn-secondary">View Details</button>
+                        </div>
+                        <div class="job-meta">
+                            <span>📍 Remote</span>
+                            <span>💰 $120k - $150k</span>
+                            <span>⏰ Full Time</span>
+                        </div>
+                        <div class="job-stats">
+                            <div class="stat">👥 24 Applicants</div>
+                            <div class="stat">📅 Posted 2 days ago</div>
+                        </div>
+                    </div>
+                    <div class="job-item">
+                        <div class="job-header">
+                            <div class="job-title">Backend Engineer</div>
+                            <button class="btn btn-secondary">View Details</button>
+                        </div>
+                        <div class="job-meta">
+                            <span>📍 New York</span>
+                            <span>💰 $100k - $130k</span>
+                            <span>⏰ Full Time</span>
+                        </div>
+                        <div class="job-stats">
+                            <div class="stat">👥 18 Applicants</div>
+                            <div class="stat">📅 Posted 5 days ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Candidate Applications -->
+            <div class="applications">
+                <div class="section-title">Recent Applications</div>
+                <div class="application-list">
+                    <div class="application-item">
+                        <div class="candidate-info">
+                            <div class="candidate-name">John Smith</div>
+                            <div class="application-status status-new">New</div>
+                        </div>
+                        <div class="candidate-meta">
+                            <span>💼 Senior Frontend Developer</span>
+                            <span>📅 Applied 2 hours ago</span>
+                        </div>
+                    </div>
+                    <div class="application-item">
+                        <div class="candidate-info">
+                            <div class="candidate-name">Sarah Johnson</div>
+                            <div class="application-status status-review">Under Review</div>
+                        </div>
+                        <div class="candidate-meta">
+                            <span>💼 Backend Engineer</span>
+                            <span>📅 Applied 1 day ago</span>
+                        </div>
+                    </div>
+                    <div class="application-item">
+                        <div class="candidate-info">
+                            <div class="candidate-name">Michael Brown</div>
+                            <div class="application-status status-interview">Interview Scheduled</div>
+                        </div>
+                        <div class="candidate-meta">
+                            <span>💼 Senior Frontend Developer</span>
+                            <span>📅 Applied 3 days ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

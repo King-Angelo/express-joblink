@@ -1,0 +1,98 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Available Jobs</h2>
+            <p class="text-muted">Browse through our latest job openings</p>
+        </div>
+        <div>
+            <% if (isAuthenticated) { %>
+                <a href="/jobs/recommended" class="btn btn-outline-primary">
+                    <i class="fas fa-star"></i> View Recommended Jobs
+                </a>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form action="/jobs" method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="search" placeholder="Search jobs..." value="<%= search || '' %>">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="type">
+                        <option value="">Job Type</option>
+                        <option value="Full-time" <%= type === 'Full-time' ? 'selected' : '' %>>Full-time</option>
+                        <option value="Part-time" <%= type === 'Part-time' ? 'selected' : '' %>>Part-time</option>
+                        <option value="Contract" <%= type === 'Contract' ? 'selected' : '' %>>Contract</option>
+                        <option value="Internship" <%= type === 'Internship' ? 'selected' : '' %>>Internship</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="location" placeholder="Location" value="<%= location || '' %>">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <% if (jobs && jobs.length > 0) { %>
+        <div class="row">
+            <% jobs.forEach(job => { %>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= job.title %></h5>
+                            <h6 class="card-subtitle mb-2 text-muted"><%= job.company %></h6>
+                            <p class="card-text">
+                                <i class="fas fa-map-marker-alt"></i> <%= job.location %><br>
+                                <i class="fas fa-briefcase"></i> <%= job.type %><br>
+                                <i class="fas fa-money-bill-wave"></i> <%= job.salary %>
+                            </p>
+                            <div class="mb-3">
+                                <% job.skills.forEach(skill => { %>
+                                    <span class="badge bg-secondary me-1"><%= skill %></span>
+                                <% }) %>
+                            </div>
+                            <p class="card-text text-truncate"><%= job.description %></p>
+                            <a href="/jobs/<%= job._id %>" class="btn btn-primary">View Details</a>
+                        </div>
+                        <div class="card-footer text-muted">
+                            Posted <%= new Date(job.postedDate).toLocaleDateString() %>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>" tabindex="-1">Previous</a>
+                    </li>
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        <% } %>
+    <% } else { %>
+        <div class="alert alert-info">
+            <p>No jobs found matching your criteria. Please try different search terms or filters.</p>
+        </div>
+    <% } %>
+</div>
+
+<%- include('../partials/footer') %> 

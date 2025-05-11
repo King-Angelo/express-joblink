@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agency Dashboard - JobLink</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f3f4f6;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .welcome {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .stat-card h3 {
+      margin: 0;
+      font-size: 0.875rem;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-card .value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+    }
+
+    .activity-section {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+
+    .activity-section h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.25rem;
+    }
+
+    .activity-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .activity-list li {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .activity-list li:last-child {
+      border-bottom: none;
+    }
+
+    .chart-section {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .chart-section h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.25rem;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-button {
+      padding: 0.5rem 1rem;
+      background: #facc15;
+      color: #1f2937;
+      border: none;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .nav-button:hover {
+      background: #eab308;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="welcome">
+        Welcome, <%= agencyName || 'Agency' %>
+      </div>
+      <div class="nav-buttons">
+        <a href="/agency/jobs" class="nav-button">Manage Jobs</a>
+        <a href="/agency/candidates" class="nav-button">View Candidates</a>
+        <a href="/agency/profile" class="nav-button">Edit Profile</a>
+        <a href="/signout" class="nav-button" style="background: #ef4444; color: white;">Sign Out</a>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Active Jobs</h3>
+        <div class="value"><%= stats.activeJobs %></div>
+      </div>
+      <div class="stat-card">
+        <h3>Total Candidates</h3>
+        <div class="value"><%= stats.totalCandidates %></div>
+      </div>
+      <div class="stat-card">
+        <h3>Interviews Scheduled</h3>
+        <div class="value"><%= stats.interviewsScheduled %></div>
+      </div>
+      <div class="stat-card">
+        <h3>Successful Placements</h3>
+        <div class="value"><%= stats.placements %></div>
+      </div>
+    </div>
+
+    <div class="activity-section">
+      <h2>Recent Activity</h2>
+      <ul class="activity-list">
+        <% recentActivity.forEach(activity => { %>
+          <li><%= activity %></li>
+        <% }); %>
+      </ul>
+    </div>
+
+    <div class="chart-section">
+      <h2>Placement Statistics</h2>
+      <canvas id="placementChart"></canvas>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('placementChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: <%- JSON.stringify(chartData.labels) %>,
+        datasets: [{
+          label: 'Placements',
+          data: <%- JSON.stringify(chartData.values) %>,
+          borderColor: '#facc15',
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html> 

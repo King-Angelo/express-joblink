@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobLink - Find Your Dream Job</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+        * {
+      margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary: #facc15;
+            --primary-dark: #eab308;
+            --primary-light: #fef9c3;
+            --text-dark: #333;
+            --text-light: #666;
+            --white: #ffffff;
+        }
+
+        body {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            color: var(--primary-dark);
+        }
+
+        .nav-links {
+      display: flex;
+            gap: 2rem;
+      align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--primary-dark);
+            color: var(--primary-dark);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--text-dark);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .hero {
+            padding: 4rem 5%;
+            background: #f8fafb;
+      text-align: center;
+    }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+      color: #333;
+    }
+
+        .hero h1 span {
+            color: var(--primary-dark);
+        }
+
+        .hero p {
+            color: #666;
+            margin-bottom: 2rem;
+      font-size: 1.1rem;
+        }
+
+        .search-box {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .popular-tags {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            color: #666;
+      text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            padding: 3rem 5%;
+            background: white;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        .featured-jobs {
+            padding: 4rem 5%;
+            background: white;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: #666;
+        }
+
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .job-card {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid var(--primary);
+        }
+
+        .job-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .full-time {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .remote {
+            background: #f0e6ff;
+            color: #8e44ad;
+        }
+
+        .view-all {
+            text-align: center;
+        }
+
+        .categories {
+            padding: 4rem 5%;
+            background: #f8fafb;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid var(--primary);
+        }
+
+        .category-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+        }
+
+        .category-jobs {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .how-it-works {
+            padding: 4rem 5%;
+            background: white;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+      font-weight: 600;
+        }
+
+        .testimonials {
+            padding: 4rem 5%;
+            background: #f8fafb;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid #eee;
+        }
+
+        .testimonial-card:hover {
+            border: 1px solid var(--primary);
+        }
+
+        .stars {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #eee;
+        }
+
+        .author-info h4 {
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .author-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .cta {
+            background: var(--primary);
+            color: var(--text-dark);
+            text-align: center;
+            padding: 4rem 5%;
+        }
+
+        .cta h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta p {
+            margin-bottom: 2rem;
+            color: var(--text-dark);
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 2rem;
+            }
+    }
+  </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <span class="logo-icon">⬢</span>
+            JobLink
+        </a>
+        <div class="nav-links">
+            <a href="/jobs">Find Jobs</a>
+            <a href="/companies">Companies</a>
+            <a href="/career-advice">Career Advice</a>
+            <a href="/salary-guide">Salary Guide</a>
+        </div>
+        <div class="auth-buttons">
+            <% if (user) { %>
+                <form action="/auth/logout" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-outline">Sign Out</button>
+                </form>
+            <% } else { %>
+                <a href="/login" class="btn btn-outline">Login</a>
+                <a href="/register" class="btn btn-primary">Sign Up</a>
+            <% } %>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Find Your Dream Job With <span>JobLink</span></h1>
+        <p>Discover thousands of job opportunities with all the information you need. Find your dream job today!</p>
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Job title or keyword">
+            <input type="text" class="search-input" placeholder="Location">
+            <a href="/jobs" class="btn btn-primary">Search Jobs</a>
+        </div>
+        <div class="popular-tags">
+            <span>Popular:</span>
+            <a href="/jobs?q=software-engineer" class="tag">Software Engineer</a>
+            <a href="/jobs?q=marketing" class="tag">Marketing</a>
+            <a href="/jobs?q=data-analyst" class="tag">Data Analyst</a>
+            <a href="/jobs?q=product-manager" class="tag">Product Manager</a>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stat-item">
+            <div class="stat-number">10K+</div>
+            <div class="stat-label">Active Jobs</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">5M+</div>
+            <div class="stat-label">Job Seekers</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">2K+</div>
+            <div class="stat-label">Companies</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">98%</div>
+            <div class="stat-label">Success Rate</div>
+        </div>
+    </section>
+
+    <section class="featured-jobs">
+        <div class="section-header">
+            <h2>Featured Jobs</h2>
+            <p>Handpicked opportunities for you</p>
+        </div>
+        <div class="jobs-grid">
+            <div class="job-card">
+                <span class="job-type full-time">Full-time</span>
+                <h3>Senior Frontend Developer</h3>
+                <p>TechCorp Inc.</p>
+                <p>San Francisco, CA</p>
+                <p>$120K - $150K</p>
+                <div class="tags">
+                    <span>React</span>
+                    <span>TypeScript</span>
+                </div>
+                <a href="/jobs/1" class="btn btn-primary">Apply</a>
+            </div>
+            <div class="job-card">
+                <span class="job-type full-time">Full-time</span>
+                <h3>Product Manager</h3>
+                <p>InnovateCo</p>
+                <p>New York, NY</p>
+                <p>$110K - $140K</p>
+                <div class="tags">
+                    <span>Agile</span>
+                    <span>SaaS</span>
+                </div>
+                <a href="/jobs/2" class="btn btn-primary">Apply</a>
+            </div>
+            <div class="job-card">
+                <span class="job-type remote">Remote</span>
+                <h3>UX/UI Designer</h3>
+                <p>DesignHub</p>
+                <p>Remote</p>
+                <p>$90K - $120K</p>
+                <div class="tags">
+                    <span>Figma</span>
+                    <span>UI/UX</span>
+                </div>
+                <a href="/jobs/3" class="btn btn-primary">Apply</a>
+            </div>
+        </div>
+        <div class="view-all">
+            <a href="/jobs" class="btn btn-outline">View all jobs →</a>
+        </div>
+    </section>
+
+    <section class="categories">
+        <div class="section-header">
+            <h2>Browse by Category</h2>
+            <p>Explore opportunities across various industries and find your perfect match</p>
+        </div>
+        <div class="categories-grid">
+            <div class="category-card">
+                <div class="category-icon">💻</div>
+                <h3>Technology</h3>
+                <p class="category-jobs">1,204 jobs</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">🎨</div>
+                <h3>Design</h3>
+                <p class="category-jobs">854 jobs</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">📈</div>
+                <h3>Marketing</h3>
+                <p class="category-jobs">970 jobs</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">💼</div>
+                <h3>Sales</h3>
+                <p class="category-jobs">742 jobs</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">⚕️</div>
+                <h3>Healthcare</h3>
+                <p class="category-jobs">1,432 jobs</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">🎓</div>
+                <h3>Education</h3>
+                <p class="category-jobs">632 jobs</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">⚙️</div>
+                <h3>Engineering</h3>
+                <p class="category-jobs">894 jobs</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">📁</div>
+                <h3>All Categories</h3>
+                <p class="category-jobs">10,000+ jobs</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <div class="section-header">
+            <h2>How JobLink Works</h2>
+            <p>Simple steps to find your dream job or the perfect candidate</p>
+        </div>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Create an Account</h3>
+                <p>Sign up and complete your profile with your skills, experience, and preferences.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Search Jobs</h3>
+                <p>Browse thousands of opportunities filtered by your preferences and qualifications.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Apply & Get Hired</h3>
+                <p>Submit your application with one click and track your application status.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <div class="section-header">
+            <h2>Success Stories</h2>
+            <p>Hear from people who found their dream jobs through JobLink</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p>"JobLink made my job search incredibly simple. Within two weeks, I had multiple interviews and landed my dream job at a tech startup!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar"></div>
+                    <div class="author-info">
+                        <h4>Sarah Johnson</h4>
+                        <p>Software Engineer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p>"As a hiring manager, JobLink has transformed our recruitment process. The quality of candidates is exceptional, and the platform is intuitive."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar"></div>
+                    <div class="author-info">
+                        <h4>Michael Chen</h4>
+                        <p>HR Director</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p>"After months of searching, I found my current position through JobLink. The job matching algorithm really works – I found roles that perfectly matched my skills."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar"></div>
+                    <div class="author-info">
+                        <h4>Jessica Williams</h4>
+                        <p>Marketing Manager</p>
+                    </div>
+                </div>
+            </div>
+  </div>
+    </section>
+
+    <section class="cta">
+        <h2>Ready to Take the Next Step in Your Career?</h2>
+        <p>Join thousands of job seekers who have found their dream jobs with JobLink</p>
+        <a href="/register" class="btn btn-primary">Get Started</a>
+    </section>
+</body>
+</html>

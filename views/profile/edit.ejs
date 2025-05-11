@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .profile-form { background-color: #fff; border: 1px solid #ddd; padding: 20px; border-radius: 5px; width: 400px; max-width: 100%; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="email"], textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; }
+        button:hover { background-color: #0056b3; }
+        h1 { color: #333; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header') %>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Edit Profile</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="/profile/edit" method="POST">
+                            <!-- Basic Information -->
+                            <div class="mb-4">
+                                <h5>Basic Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="name" class="form-label">Full Name</label>
+                                        <input type="text" class="form-control" id="name" name="name" value="<%= user.name %>" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="title" class="form-label">Professional Title</label>
+                                        <input type="text" class="form-control" id="title" name="title" value="<%= user.title || '' %>">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="bio" class="form-label">Bio</label>
+                                    <textarea class="form-control" id="bio" name="bio" rows="3"><%= user.bio || '' %></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="location" class="form-label">Location</label>
+                                    <input type="text" class="form-control" id="location" name="location" value="<%= user.location || '' %>">
+                                </div>
+                            </div>
+
+                            <!-- Contact Information -->
+                            <div class="mb-4">
+                                <h5>Contact Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="phone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone" value="<%= user.phone || '' %>">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="linkedin" class="form-label">LinkedIn Profile</label>
+                                        <input type="url" class="form-control" id="linkedin" name="linkedin" value="<%= user.linkedin || '' %>">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Skills -->
+                            <div class="mb-4">
+                                <h5>Skills</h5>
+                                <div class="mb-3">
+                                    <label for="skills" class="form-label">Add Skills (comma separated)</label>
+                                    <input type="text" class="form-control" id="skills" name="skills" value="<%= user.skills ? user.skills.join(', ') : '' %>">
+                                    <div class="form-text">Example: JavaScript, React, Node.js, MongoDB</div>
+                                </div>
+                            </div>
+
+                            <!-- Job Preferences -->
+                            <div class="mb-4">
+                                <h5>Job Preferences</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="preferredJobTypes" class="form-label">Preferred Job Types</label>
+                                        <input type="text" class="form-control" id="preferredJobTypes" name="preferredJobTypes" value="<%= user.preferredJobTypes ? user.preferredJobTypes.join(', ') : '' %>">
+                                        <div class="form-text">Example: Full-time, Remote, Contract</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="preferredLocations" class="form-label">Preferred Locations</label>
+                                        <input type="text" class="form-control" id="preferredLocations" name="preferredLocations" value="<%= user.preferredLocations ? user.preferredLocations.join(', ') : '' %>">
+                                        <div class="form-text">Example: New York, Remote, San Francisco</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="expectedSalary" class="form-label">Expected Salary</label>
+                                    <input type="text" class="form-control" id="expectedSalary" name="expectedSalary" value="<%= user.expectedSalary || '' %>">
+                                </div>
+                            </div>
+
+                            <!-- Work Experience -->
+                            <div class="mb-4">
+                                <h5>Work Experience</h5>
+                                <% if (user.experience && user.experience.length > 0) { %>
+                                    <% user.experience.forEach((exp, index) => { %>
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Job Title</label>
+                                                        <input type="text" class="form-control" name="experience[<%= index %>][title]" value="<%= exp.title %>">
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Company</label>
+                                                        <input type="text" class="form-control" name="experience[<%= index %>][company]" value="<%= exp.company %>">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Start Date</label>
+                                                        <input type="date" class="form-control" name="experience[<%= index %>][startDate]" value="<%= exp.startDate.toISOString().split('T')[0] %>">
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">End Date</label>
+                                                        <input type="date" class="form-control" name="experience[<%= index %>][endDate]" value="<%= exp.endDate ? exp.endDate.toISOString().split('T')[0] : '' %>">
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Description</label>
+                                                    <textarea class="form-control" name="experience[<%= index %>][description]" rows="3"><%= exp.description %></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } %>
+                                <button type="button" class="btn btn-outline-primary" onclick="addExperience()">
+                                    <i class="fas fa-plus"></i> Add Experience
+                                </button>
+                            </div>
+
+                            <!-- Education -->
+                            <div class="mb-4">
+                                <h5>Education</h5>
+                                <% if (user.education && user.education.length > 0) { %>
+                                    <% user.education.forEach((edu, index) => { %>
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Degree</label>
+                                                        <input type="text" class="form-control" name="education[<%= index %>][degree]" value="<%= edu.degree %>">
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">School</label>
+                                                        <input type="text" class="form-control" name="education[<%= index %>][school]" value="<%= edu.school %>">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Start Date</label>
+                                                        <input type="date" class="form-control" name="education[<%= index %>][startDate]" value="<%= edu.startDate.toISOString().split('T')[0] %>">
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">End Date</label>
+                                                        <input type="date" class="form-control" name="education[<%= index %>][endDate]" value="<%= edu.endDate ? edu.endDate.toISOString().split('T')[0] : '' %>">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } %>
+                                <button type="button" class="btn btn-outline-primary" onclick="addEducation()">
+                                    <i class="fas fa-plus"></i> Add Education
+                                </button>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="/profile" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function addExperience() {
+        const experienceSection = document.querySelector('.mb-4:nth-last-child(2)');
+        const newExperience = document.createElement('div');
+        newExperience.className = 'card mb-3';
+        newExperience.innerHTML = `
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Job Title</label>
+                        <input type="text" class="form-control" name="experience[new][title]" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Company</label>
+                        <input type="text" class="form-control" name="experience[new][company]" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" class="form-control" name="experience[new][startDate]" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">End Date</label>
+                        <input type="date" class="form-control" name="experience[new][endDate]">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" name="experience[new][description]" rows="3"></textarea>
+                </div>
+            </div>
+        `;
+        experienceSection.insertBefore(newExperience, experienceSection.lastElementChild);
+    }
+
+    function addEducation() {
+        const educationSection = document.querySelector('.mb-4:last-child');
+        const newEducation = document.createElement('div');
+        newEducation.className = 'card mb-3';
+        newEducation.innerHTML = `
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Degree</label>
+                        <input type="text" class="form-control" name="education[new][degree]" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">School</label>
+                        <input type="text" class="form-control" name="education[new][school]" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" class="form-control" name="education[new][startDate]" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">End Date</label>
+                        <input type="date" class="form-control" name="education[new][endDate]">
+        </div>
+        </div>
+        </div>
+        `;
+        educationSection.insertBefore(newEducation, educationSection.lastElementChild);
+    }
+    </script>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

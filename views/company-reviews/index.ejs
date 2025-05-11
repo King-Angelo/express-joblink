@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Reviews</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body { font-family: 'Arial', sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .review-card { background-color: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; position: relative; }
+        .company-name { font-size: 1.2em; font-weight: bold; margin-bottom: 5px; }
+        .rating { color: gold; font-size: 1.1em; margin-bottom: 5px; }
+        .review-text { color: #555; margin-bottom: 10px; }
+        .review-date { color: #999; font-size: 0.9em; }
+        h1 { color: #333; display: flex; justify-content: space-between; align-items: center; }
+        .back-arrow { font-size: 1.5em; color: #555; cursor: pointer; }
+        .back-arrow:hover { color: #007bff; }
+        .no-reviews { color: #777; }
+    </style>
+</head>
+<body>
+    <h1>
+        Company Reviews
+        <a href="/" class="back-arrow" title="Back to Dashboard"><i class="fas fa-arrow-left"></i></a>
+    </h1>
+
+    <% if (reviews && reviews.length > 0) { %>
+        <% reviews.forEach(review => { %>
+            <div class="review-card">
+                <div class="company-name"><%= review.companyName %></div>
+                <div class="rating">
+                    <% for (let i = 0; i < review.rating; i++) { %>
+                        ★
+                    <% } %>
+                </div>
+                <div class="review-text"><%= review.reviewText %></div>
+                <div class="review-date">Reviewed on: <%= new Date(review.date).toLocaleDateString() %></div>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <p class="no-reviews">No company reviews available yet.</p>
+    <% } %>
+
+    </body>
+</html>

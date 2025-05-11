@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            padding-top: 2rem;
+        }
+        .contact-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .contact-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .contact-header h1 {
+            color: #1f2937;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .contact-header p {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #f8fafc;
+            border-radius: 8px;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .info-item i {
+            font-size: 1.5rem;
+            color: #facc15;
+        }
+        .info-item div {
+            flex: 1;
+        }
+        .info-item h3 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        .info-item p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        .contact-form {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+        }
+        .form-control {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 0.75rem;
+        }
+        .form-control:focus {
+            border-color: #facc15;
+            box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.25);
+        }
+        .btn-submit {
+            background-color: #facc15;
+            color: #111;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+        .btn-submit:hover {
+            background-color: #eab308;
+        }
+        .alert {
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <div class="container">
+        <div class="contact-container">
+            <div class="contact-header">
+                <h1>Contact Us</h1>
+                <p>Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+            </div>
+
+            <% if (locals.flash) { %>
+                <% if (flash.success) { %>
+                    <div class="alert alert-success">
+                        <%= flash.success %>
+                    </div>
+                <% } %>
+                <% if (flash.error) { %>
+                    <div class="alert alert-danger">
+                        <%= flash.error %>
+                    </div>
+                <% } %>
+            <% } %>
+
+            <div class="contact-info">
+                <div class="info-item">
+                    <i class="fas fa-envelope"></i>
+                    <div>
+                        <h3>Email</h3>
+                        <p>support@joblink.com</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-phone"></i>
+                    <div>
+                        <h3>Phone</h3>
+                        <p>+1 (555) 123-4567</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <h3>Location</h3>
+                        <p>Manila, Philippines</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-form">
+                <form action="/contact" method="POST">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-submit">Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
