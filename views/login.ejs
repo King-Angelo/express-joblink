@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - JobLink</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' style='font-family: Arial, sans-serif; font-weight: bold;'>J</text></svg>">
   <style>
     :root {
       --primary: #facc15;
@@ -116,9 +117,25 @@
       margin-bottom: 1rem;
       text-align: center;
     }
+
+    .home-button {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      text-decoration: none;
+      color: var(--primary);
+      font-size: 1.5rem;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .home-button:hover {
+      color: var(--primary-dark);
+    }
   </style>
 </head>
 <body>
+  <a href="/" class="home-button">JobLink</a>
   <div class="login-container">
     <div class="logo">JobLink</div>
     
