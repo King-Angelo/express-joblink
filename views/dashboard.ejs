@@ -288,8 +288,10 @@
 
         .agencies-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .agency-card {
@@ -297,6 +299,9 @@
             padding: 1.5rem;
             border-radius: 0.5rem;
             transition: all 0.2s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .agency-card:hover {
@@ -314,22 +319,34 @@
             color: var(--gray-700);
             font-size: 0.875rem;
             margin-bottom: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--gray-200);
+            border-radius: 0.25rem;
+            display: inline-block;
         }
 
-        .agency-location {
+        .agency-location,
+        .agency-contact {
             color: var(--gray-700);
             font-size: 0.875rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
         .agency-description {
             color: var(--gray-700);
             font-size: 0.875rem;
-            margin-bottom: 1rem;
+            margin: 1rem 0;
+            flex-grow: 1;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+        }
+
+        .agency-card .btn {
+            margin-top: auto;
+            width: 100%;
+            text-align: center;
         }
     </style>
 </head>
@@ -415,7 +432,7 @@
                                         <div class="agency-contact">🌐 <%= agency.website %></div>
                                     <% } %>
                                     <p class="agency-description"><%= agency.description || 'No description available' %></p>
-                                    <a href="/agencies/<%= agency._id %>" class="btn btn-secondary">View Profile</a>
+                                    <a href="/agencies/<%= agency._id %>" class="btn btn-primary">View Profile</a>
                                 </div>
                             <% }); %>
                         <% } %>
@@ -430,7 +447,7 @@
                                         <div class="agency-contact">🌐 <%= employer.website %></div>
                                     <% } %>
                                     <p class="agency-description"><%= employer.description || 'No description available' %></p>
-                                    <a href="/agencies/<%= employer._id %>" class="btn btn-secondary">View Profile</a>
+                                    <a href="/agencies/<%= employer._id %>" class="btn btn-primary">View Profile</a>
                                 </div>
                             <% }); %>
                         <% } %>
