@@ -4,19 +4,20 @@ const User = require('../models/User');
 const JobAlert = require('../models/JobAlert');
 const JobApplication = require('../models/JobApplication');
 const Job = require('../models/Job');
+const Employer = require('../models/Employer');
 
 // Middleware to check if user is authenticated and has the correct user type
 const checkUserType = (allowedTypes) => {
     return (req, res, next) => {
         if (!req.session.userId || !req.session.userType) {
-            return res.redirect('/login');
-        }
+        return res.redirect('/login');
+    }
         
         if (!allowedTypes.includes(req.session.userType)) {
             return res.redirect(`/${req.session.userType}/dashboard`);
         }
         
-        next();
+    next();
     };
 };
 
@@ -44,12 +45,33 @@ router.get('/', checkUserType(['jobseeker']), async (req, res) => {
             .sort({ postedDate: -1 })
             .limit(5);
 
+        // Fetch agencies and employers
+        const agencies = await User.find({
+            userType: { $in: ['agency', 'employer'] },
+            deletedAt: { $exists: false },
+            'agencyProfile.agencyName': { $exists: true, $ne: '' }
+        })
+        .select('agencyProfile.agencyName email description location website userType')
+        .sort({ 'agencyProfile.agencyName': 1 });
+
+        // Transform the data to match the view's expectations
+        const transformedAgencies = agencies.map(agency => ({
+            _id: agency._id,
+            companyName: agency.agencyProfile.agencyName,
+            email: agency.email,
+            description: agency.description || 'No description available',
+            location: agency.location || 'Location not specified',
+            website: agency.website,
+            userType: agency.userType
+        }));
+
         res.render('dashboard', {
             user,
             firstName: user.firstName,
             newJobs: unreadAlerts.length,
             recentAlerts,
             jobs,
+            agencies: transformedAgencies,
             isAuthenticated: true
         });
     } catch (error) {
@@ -91,6 +113,87 @@ router.get('/employer', checkUserType(['employer']), async (req, res) => {
     } catch (error) {
         console.error('Employer dashboard error:', error);
         res.status(500).render('error', { message: 'Error loading employer dashboard' });
+    }
+});
+
+// Employer Company Profile
+router.get('/employer/profile', checkUserType(['employer']), async (req, res) => {
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            return res.redirect('/login');
+        }
+
+        // Get or create employer profile
+        let employer = await Employer.findOne({ user: req.session.userId });
+        if (!employer) {
+            employer = new Employer({
+                user: req.session.userId,
+                companyName: user.title || 'Unnamed Company',
+                companyDescription: user.description || '',
+                industry: '',
+                companySize: '1-10',
+                location: user.location || '',
+                contactEmail: user.email,
+                contactPhone: user.phone || ''
+            });
+            await employer.save();
+        }
+
+        res.render('employer/profile', {
+            user,
+            employer,
+            success: req.query.success
+        });
+    } catch (error) {
+        console.error('Error loading employer profile:', error);
+        res.status(500).render('error', { message: 'Error loading employer profile' });
+    }
+});
+
+// Update Employer Company Profile
+router.post('/employer/profile', checkUserType(['employer']), async (req, res) => {
+    try {
+        const {
+            companyName,
+            companyDescription,
+            industry,
+            companySize,
+            location,
+            contactEmail,
+            contactPhone,
+            website
+        } = req.body;
+
+        // Update or create employer profile
+        const employer = await Employer.findOneAndUpdate(
+            { user: req.session.userId },
+            {
+                companyName,
+                companyDescription,
+                industry,
+                companySize,
+                location,
+                contactEmail,
+                contactPhone,
+                website
+            },
+            { new: true, upsert: true }
+        );
+
+        // Update user profile with basic info
+        await User.findByIdAndUpdate(req.session.userId, {
+            title: companyName,
+            description: companyDescription,
+            location: location,
+            email: contactEmail,
+            phone: contactPhone
+        });
+
+        res.redirect('/dashboard/employer/profile?success=true');
+    } catch (error) {
+        console.error('Error updating employer profile:', error);
+        res.status(500).render('error', { message: 'Error updating employer profile' });
     }
 });
 

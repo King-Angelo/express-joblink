@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Agencies & Employers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' style='font-family: Arial, sans-serif; font-weight: bold;'>J</text></svg>">
+    <style>
+        :root {
+            --primary: #facc15;
+            --primary-dark: #eab308;
+            --secondary: #3b82f6;
+            --success: #10b981;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-900);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .back-link {
+            color: var(--gray-700);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-link:hover {
+            color: var(--gray-900);
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .section-icon {
+            font-size: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .section-description {
+            color: var(--gray-700);
+            margin-top: 0.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--gray-100);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--gray-200);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray-900);
+        }
+
+        .card-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: var(--gray-900);
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-info {
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-description {
+            color: var(--gray-700);
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--gray-900);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .success-message {
+            background: var(--success);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-700);
+        }
+
+        .agency-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: var(--gray-900);
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/dashboard" class="back-link">
+                <span>←</span> Back to Dashboard
+            </a>
+        </div>
+
+        <% if (req.query.success) { %>
+            <div class="success-message">
+                Your application has been submitted successfully!
+            </div>
+        <% } %>
+
+        <!-- Recruitment Agencies Section -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🏢</div>
+                <div>
+                    <h2 class="section-title">Agencies</h2>
+                    <p class="section-description">Connect with professional agencies to help you find the perfect job opportunities.</p>
+                </div>
+            </div>
+            <div class="grid">
+                <% 
+                const agencyList = agencies.filter(a => a.userType === 'agency');
+                if (agencyList && agencyList.length > 0) { 
+                %>
+                    <% agencyList.forEach(agency => { %>
+                        <div class="card">
+                            <h3 class="card-title"><%= agency.companyName %></h3>
+                            <span class="agency-type"><%= agency.agencyProfile?.companyType ? agency.agencyProfile.companyType.charAt(0).toUpperCase() + agency.agencyProfile.companyType.slice(1) + ' Agency' : 'Agency' %></span>
+                            <p class="card-info">📍 <%= agency.location || 'Location not specified' %></p>
+                            <p class="card-info">📧 <%= agency.email %></p>
+                            <% if (agency.website) { %>
+                                <p class="card-info">🌐 <%= agency.website %></p>
+                            <% } %>
+                            <p class="card-description"><%= agency.description || 'No description available' %></p>
+                            <a href="/agencies/<%= agency._id %>" class="btn btn-primary">View Profile</a>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="empty-state">
+                        <p>No agencies available at the moment.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Employers Section -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">💼</div>
+                <div>
+                    <h2 class="section-title">Direct Employers</h2>
+                    <p class="section-description">Browse companies that are hiring directly and find your next career opportunity.</p>
+                </div>
+            </div>
+            <div class="grid">
+                <% 
+                const employerList = agencies.filter(a => a.userType === 'employer');
+                if (employerList && employerList.length > 0) { 
+                %>
+                    <% employerList.forEach(employer => { %>
+                        <div class="card">
+                            <h3 class="card-title"><%= employer.companyName %></h3>
+                            <span class="card-type">Direct Employer</span>
+                            <p class="card-info">📍 <%= employer.location || 'Location not specified' %></p>
+                            <p class="card-info">📧 <%= employer.email %></p>
+                            <% if (employer.website) { %>
+                                <p class="card-info">🌐 <%= employer.website %></p>
+                            <% } %>
+                            <p class="card-description"><%= employer.description || 'No description available' %></p>
+                            <a href="/agencies/<%= employer._id %>" class="btn btn-primary">View Profile</a>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="empty-state">
+                        <p>No direct employers available at the moment.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

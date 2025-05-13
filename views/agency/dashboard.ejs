@@ -122,7 +122,7 @@
 </head>
 <body>
   <div class="container">
-    <div class="header">
+      <div class="header">
       <div class="welcome">
         Welcome, <%= agencyName || 'Agency' %>
       </div>
@@ -131,36 +131,36 @@
         <a href="/agency/candidates" class="nav-button">View Candidates</a>
         <a href="/agency/profile" class="nav-button">Edit Profile</a>
         <a href="/signout" class="nav-button" style="background: #ef4444; color: white;">Sign Out</a>
+        </div>
       </div>
-    </div>
 
-    <div class="stats-grid">
-      <div class="stat-card">
+      <div class="stats-grid">
+        <div class="stat-card">
         <h3>Active Jobs</h3>
         <div class="value"><%= stats.activeJobs %></div>
-      </div>
-      <div class="stat-card">
+        </div>
+        <div class="stat-card">
         <h3>Total Candidates</h3>
         <div class="value"><%= stats.totalCandidates %></div>
-      </div>
-      <div class="stat-card">
+        </div>
+        <div class="stat-card">
         <h3>Interviews Scheduled</h3>
         <div class="value"><%= stats.interviewsScheduled %></div>
-      </div>
-      <div class="stat-card">
+        </div>
+        <div class="stat-card">
         <h3>Successful Placements</h3>
         <div class="value"><%= stats.placements %></div>
+        </div>
       </div>
-    </div>
 
     <div class="activity-section">
       <h2>Recent Activity</h2>
-      <ul class="activity-list">
+        <ul class="activity-list">
         <% recentActivity.forEach(activity => { %>
           <li><%= activity %></li>
         <% }); %>
-      </ul>
-    </div>
+        </ul>
+      </div>
 
     <div class="chart-section">
       <h2>Placement Statistics</h2>

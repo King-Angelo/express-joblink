@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= profile.companyName %> - JobLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' style='font-family: Arial, sans-serif; font-weight: bold;'>J</text></svg>">
+    <style>
+        :root {
+            --primary: #facc15;
+            --primary-dark: #eab308;
+            --secondary: #3b82f6;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-900);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .home-button {
+            text-decoration: none;
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .home-button:hover {
+            color: var(--primary-dark);
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .profile-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .company-name {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .company-type {
+            color: var(--gray-700);
+            font-size: 1rem;
+            text-transform: capitalize;
+        }
+
+        .info-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-content {
+            color: var(--gray-700);
+            line-height: 1.6;
+        }
+
+        .application-form {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .submit-button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: var(--gray-900);
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .submit-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--gray-700);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            color: var(--gray-900);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: var(--gray-900);
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            margin: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="home-button">JobLink</a>
+            <a href="/agencies/browse" class="back-link">← Back to Browse</a>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-header">
+                <h1 class="company-name"><%= profile.companyName %></h1>
+                <p class="company-type">
+                    <%= profile.companyType ? profile.companyType.charAt(0).toUpperCase() + profile.companyType.slice(1) + ' Agency' : profile.userType.charAt(0).toUpperCase() + profile.userType.slice(1) %>
+                </p>
+            </div>
+
+            <div class="info-section">
+                <h2 class="info-title">Contact Information</h2>
+                <p class="info-content">📧 <%= profile.email %></p>
+                <p class="info-content">📍 <%= profile.location || 'Location not specified' %></p>
+                <% if (profile.website) { %>
+                    <p class="info-content">
+                        🌐 <a href="<%= profile.website %>" target="_blank" rel="noopener noreferrer">
+                            <%= profile.website %>
+                        </a>
+                    </p>
+                <% } %>
+            </div>
+
+            <div class="info-section">
+                <h2 class="info-title">About</h2>
+                <p class="info-content"><%= profile.description || 'No description available' %></p>
+            </div>
+
+            <% if (profile.userType === 'agency') { %>
+                <% if (profile.foundedYear) { %>
+                    <div class="info-section">
+                        <h2 class="info-title">Founded</h2>
+                        <p class="info-content">📅 <%= profile.foundedYear %></p>
+                    </div>
+                <% } %>
+
+                <% if (profile.services && profile.services.length > 0) { %>
+                    <div class="info-section">
+                        <h2 class="info-title">Services</h2>
+                        <div class="info-content">
+                            <% profile.services.forEach(service => { %>
+                                <span class="tag"><%= service.charAt(0).toUpperCase() + service.slice(1) %></span>
+                            <% }); %>
+                        </div>
+                    </div>
+                <% } %>
+
+                <% if (profile.specialties) { %>
+                    <div class="info-section">
+                        <h2 class="info-title">Specialties</h2>
+                        <p class="info-content"><%= profile.specialties %></p>
+                    </div>
+                <% } %>
+            <% } else if (profile.userType === 'employer') { %>
+                <% if (profile.industry) { %>
+                    <div class="info-section">
+                        <h2 class="info-title">Industry</h2>
+                        <p class="info-content"><%= profile.industry %></p>
+                    </div>
+                <% } %>
+
+                <% if (profile.companySize) { %>
+                    <div class="info-section">
+                        <h2 class="info-title">Company Size</h2>
+                        <p class="info-content"><%= profile.companySize %></p>
+                    </div>
+                <% } %>
+            <% } %>
+        </div>
+
+        <% if (user.userType === 'jobseeker') { %>
+            <div class="application-form">
+                <h2 class="info-title">Submit Application</h2>
+                <form action="/agencies/<%= profile._id %>/apply" method="POST">
+                    <div class="form-group">
+                        <label for="resume">Resume</label>
+                        <textarea id="resume" name="resume" required placeholder="Paste your resume here..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="coverLetter">Cover Letter</label>
+                        <textarea id="coverLetter" name="coverLetter" required placeholder="Write your cover letter here..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-button">Submit Application</button>
+                </form>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html> 

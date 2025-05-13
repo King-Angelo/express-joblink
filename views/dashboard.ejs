@@ -264,6 +264,73 @@
             background: var(--danger);
             color: white;
         }
+
+        /* Agencies and Employers Section */
+        .agencies-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .agencies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .agency-card {
+            background: var(--gray-100);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .agency-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .agency-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .agency-type {
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .agency-location {
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .agency-description {
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
@@ -286,6 +353,9 @@
                 </a>
                 <a href="/profile" class="nav-item">
                     <i>👤</i> Profile
+                </a>
+                <a href="/agencies/browse" class="nav-item">
+                    <i>🏢</i> Agencies & Employers
                 </a>
                 <div class="sign-out">
                     <a href="/signout" class="nav-item">
@@ -323,6 +393,29 @@
                         <div class="status-count">4</div>
                         <div class="status-label">Saved Jobs</div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Agencies and Employers Section -->
+            <div class="agencies-section">
+                <div class="section-header">
+                    <h2 class="section-title">Featured Agencies & Employers</h2>
+                    <a href="/agencies/browse" class="btn btn-primary">View All</a>
+                </div>
+                <div class="agencies-grid">
+                    <% if (agencies && agencies.length > 0) { %>
+                        <% agencies.slice(0, 3).forEach(agency => { %>
+                            <div class="agency-card">
+                                <h3 class="agency-name"><%= agency.companyName %></h3>
+                                <div class="agency-type"><%= agency.userType === 'agency' ? 'Recruitment Agency' : 'Employer' %></div>
+                                <div class="agency-location"><i class="fas fa-map-marker-alt"></i> <%= agency.location %></div>
+                                <p class="agency-description"><%= agency.description %></p>
+                                <a href="/agencies/<%= agency._id %>" class="btn btn-secondary">View Profile</a>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>No agencies or employers available at the moment.</p>
+                    <% } %>
                 </div>
             </div>
 
