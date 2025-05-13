@@ -67,8 +67,24 @@ const UserSchema = new mongoose.Schema({
     enum: ['jobseeker', 'agency', 'employer']
   },
   // Common fields for all user types
-  firstName: String,
-  lastName: String,
+  firstName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  middleName: {
+    type: String,
+    trim: true
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  name: {
+    type: String,
+    trim: true
+  },
   phone: String,
   createdAt: {
     type: Date,

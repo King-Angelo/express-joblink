@@ -73,7 +73,9 @@ router.get('/edit', authMiddleware, async (req, res, next) => {
 router.post('/edit', authMiddleware, async (req, res, next) => {
     try {
         const {
-            name,
+            firstName,
+            middleName,
+            lastName,
             title,
             bio,
             location,
@@ -88,13 +90,19 @@ router.post('/edit', authMiddleware, async (req, res, next) => {
         } = req.body;
 
         // Validate required fields
-        if (!name) {
-            req.session.error = 'Name is required';
+        if (!firstName || !lastName) {
+            req.session.error = 'First name and last name are required';
             return res.redirect('/profile/edit');
         }
 
+        // Construct full name
+        const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
+
         const updateData = {
-            name,
+            firstName,
+            middleName,
+            lastName,
+            name: fullName, // Keep for backward compatibility
             title: title || '',
             bio: bio || '',
             location: location || '',
@@ -139,6 +147,9 @@ router.post('/edit', authMiddleware, async (req, res, next) => {
             req.session.error = 'User not found';
             return res.redirect('/login');
         }
+        
+        // Update session with new first name
+        req.session.firstName = firstName;
         
         req.session.success = 'Profile updated successfully';
         res.redirect('/profile');

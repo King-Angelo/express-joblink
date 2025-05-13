@@ -113,13 +113,14 @@ router.get('/', checkUserType(['jobseeker']), async (req, res) => {
 
         res.render('dashboard', {
             user,
-            firstName: user.firstName,
+            firstName: user.firstName || req.session.firstName,
             newJobs: unreadAlerts.length,
             recentAlerts,
             jobs,
             agencies,
             employers: uniqueEmployers,
-            isAuthenticated: true
+            isAuthenticated: true,
+            success: req.query.success
         });
     } catch (error) {
         console.error('Dashboard error:', error);
@@ -336,6 +337,82 @@ router.get("/profile/edit", checkUserType(['jobseeker']), async (req, res) => {
     } catch (error) {
         console.error('Error loading profile edit page:', error);
         res.status(500).render('error', { message: 'Error loading profile edit page' });
+    }
+});
+
+// Update Profile
+router.post("/profile/edit", checkUserType(['jobseeker']), async (req, res) => {
+    try {
+        const {
+            firstName,
+            middleName,
+            lastName,
+            title,
+            bio,
+            location,
+            phone,
+            linkedin,
+            skills,
+            preferredJobTypes,
+            preferredLocations,
+            expectedSalary,
+            experience,
+            education
+        } = req.body;
+
+        // Validate required name fields
+        if (!firstName || !lastName) {
+            return res.status(400).render('profile/edit', {
+                user: req.body,
+                error: 'First name and last name are required'
+            });
+        }
+
+        // Split comma-separated strings into arrays
+        const skillsArray = skills ? skills.split(',').map(skill => skill.trim()) : [];
+        const preferredJobTypesArray = preferredJobTypes ? preferredJobTypes.split(',').map(type => type.trim()) : [];
+        const preferredLocationsArray = preferredLocations ? preferredLocations.split(',').map(loc => loc.trim()) : [];
+
+        // Construct full name
+        const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
+
+        // Update user profile
+        const updatedUser = await User.findByIdAndUpdate(
+            req.session.userId,
+            {
+                firstName,
+                middleName,
+                lastName,
+                name: fullName,
+                title,
+                bio,
+                location,
+                phone,
+                linkedin,
+                skills: skillsArray,
+                preferredJobTypes: preferredJobTypesArray,
+                preferredLocations: preferredLocationsArray,
+                expectedSalary,
+                experience: experience || [],
+                education: education || []
+            },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).render('error', { message: 'User not found' });
+        }
+
+        // Update session with new first name
+        req.session.firstName = firstName;
+
+        res.redirect('/dashboard?success=true');
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.status(500).render('profile/edit', {
+            user: req.body,
+            error: 'Error updating profile. Please try again.'
+        });
     }
 });
 
