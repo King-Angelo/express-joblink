@@ -45,25 +45,71 @@ router.get('/', checkUserType(['jobseeker']), async (req, res) => {
             .sort({ postedDate: -1 })
             .limit(5);
 
-        // Fetch agencies and employers
-        const agencies = await User.find({
-            userType: { $in: ['agency', 'employer'] },
-            deletedAt: { $exists: false },
-            'agencyProfile.agencyName': { $exists: true, $ne: '' }
+        // Fetch agencies from User model
+        const userAgencies = await User.find({
+            userType: 'agency',
+            deletedAt: { $exists: false }
         })
-        .select('agencyProfile.agencyName email description location website userType')
-        .sort({ 'agencyProfile.agencyName': 1 });
+        .select('agencyProfile email description location website userType')
+        .sort({ 'agencyProfile.agencyName': 1 })
+        .lean();
 
-        // Transform the data to match the view's expectations
-        const transformedAgencies = agencies.map(agency => ({
+        // Fetch employers from User model
+        const userEmployers = await User.find({
+            userType: 'employer',
+            deletedAt: { $exists: false }
+        })
+        .select('employerProfile email description location website userType title')
+        .sort({ title: 1 })
+        .lean();
+
+        // Fetch employers from Employer model
+        const employerProfiles = await Employer.find()
+            .populate('user', 'email userType')
+            .sort({ companyName: 1 })
+            .lean();
+
+        // Transform agency data
+        const agencies = userAgencies.map(agency => ({
             _id: agency._id,
-            companyName: agency.agencyProfile.agencyName,
+            companyName: agency.agencyProfile?.agencyName,
             email: agency.email,
-            description: agency.description || 'No description available',
-            location: agency.location || 'Location not specified',
-            website: agency.website,
-            userType: agency.userType
+            description: agency.agencyProfile?.description || agency.description || 'No description available',
+            location: agency.agencyProfile?.address || agency.location || 'Location not specified',
+            website: agency.agencyProfile?.website || agency.website,
+            userType: agency.userType,
+            companyType: agency.agencyProfile?.companyType
+        })).filter(agency => agency.companyName);
+
+        // Transform employer data from User model
+        const userEmployerList = userEmployers.map(employer => ({
+            _id: employer._id,
+            companyName: employer.title || employer.employerProfile?.companyName,
+            email: employer.email,
+            description: employer.description || 'No description available',
+            location: employer.location || 'Location not specified',
+            website: employer.website,
+            userType: employer.userType
+        })).filter(employer => employer.companyName);
+
+        // Transform employer data from Employer model
+        const employerList = employerProfiles.map(employer => ({
+            _id: employer._id,
+            companyName: employer.companyName,
+            email: employer.contactEmail,
+            description: employer.companyDescription || 'No description available',
+            location: employer.location || 'Location not specified',
+            website: employer.website,
+            userType: employer.user?.userType || 'employer',
+            industry: employer.industry,
+            companySize: employer.companySize
         }));
+
+        // Combine and deduplicate employers
+        const allEmployers = [...userEmployerList, ...employerList];
+        const uniqueEmployers = allEmployers.filter((employer, index, self) =>
+            index === self.findIndex((e) => e.email === employer.email)
+        );
 
         res.render('dashboard', {
             user,
@@ -71,7 +117,8 @@ router.get('/', checkUserType(['jobseeker']), async (req, res) => {
             newJobs: unreadAlerts.length,
             recentAlerts,
             jobs,
-            agencies: transformedAgencies,
+            agencies,
+            employers: uniqueEmployers,
             isAuthenticated: true
         });
     } catch (error) {

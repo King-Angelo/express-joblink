@@ -403,16 +403,37 @@
                     <a href="/agencies/browse" class="btn btn-primary">View All</a>
                 </div>
                 <div class="agencies-grid">
-                    <% if (agencies && agencies.length > 0) { %>
-                        <% agencies.slice(0, 3).forEach(agency => { %>
-                            <div class="agency-card">
-                                <h3 class="agency-name"><%= agency.companyName %></h3>
-                                <div class="agency-type"><%= agency.userType === 'agency' ? 'Recruitment Agency' : 'Employer' %></div>
-                                <div class="agency-location"><i class="fas fa-map-marker-alt"></i> <%= agency.location %></div>
-                                <p class="agency-description"><%= agency.description %></p>
-                                <a href="/agencies/<%= agency._id %>" class="btn btn-secondary">View Profile</a>
-                            </div>
-                        <% }); %>
+                    <% if ((agencies && agencies.length > 0) || (employers && employers.length > 0)) { %>
+                        <% if (agencies && agencies.length > 0) { %>
+                            <% agencies.slice(0, 3).forEach(agency => { %>
+                                <div class="agency-card">
+                                    <h3 class="agency-name"><%= agency.companyName %></h3>
+                                    <div class="agency-type"><%= agency.companyType ? agency.companyType.charAt(0).toUpperCase() + agency.companyType.slice(1) + ' Agency' : 'Agency' %></div>
+                                    <div class="agency-location">📍 <%= agency.location || 'Location not specified' %></div>
+                                    <div class="agency-contact">📧 <%= agency.email %></div>
+                                    <% if (agency.website) { %>
+                                        <div class="agency-contact">🌐 <%= agency.website %></div>
+                                    <% } %>
+                                    <p class="agency-description"><%= agency.description || 'No description available' %></p>
+                                    <a href="/agencies/<%= agency._id %>" class="btn btn-secondary">View Profile</a>
+                                </div>
+                            <% }); %>
+                        <% } %>
+                        <% if (employers && employers.length > 0) { %>
+                            <% employers.slice(0, 3).forEach(employer => { %>
+                                <div class="agency-card">
+                                    <h3 class="agency-name"><%= employer.companyName %></h3>
+                                    <div class="agency-type">Direct Employer</div>
+                                    <div class="agency-location">📍 <%= employer.location || 'Location not specified' %></div>
+                                    <div class="agency-contact">📧 <%= employer.email %></div>
+                                    <% if (employer.website) { %>
+                                        <div class="agency-contact">🌐 <%= employer.website %></div>
+                                    <% } %>
+                                    <p class="agency-description"><%= employer.description || 'No description available' %></p>
+                                    <a href="/agencies/<%= employer._id %>" class="btn btn-secondary">View Profile</a>
+                                </div>
+                            <% }); %>
+                        <% } %>
                     <% } else { %>
                         <p>No agencies or employers available at the moment.</p>
                     <% } %>
