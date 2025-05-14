@@ -27,7 +27,6 @@ const profileRoutes = require("./routes/profile");
 const jobAlertRoutes = require("./routes/jobAlerts");
 const employerRoutes = require("./routes/employer");
 const pageRoutes = require("./routes/pages");
-const devRoutes = require("./routes/dev"); // Assuming you have this file
 const agenciesRoutes = require("./routes/agencies");
 
 app.use(cors());
@@ -114,7 +113,6 @@ app.use("/job-alerts", authMiddleware, jobAlertRoutes);
 app.use("/employer", employerRoutes);
 app.use("/agencies", agenciesRoutes);
 app.use("/", pageRoutes);
-app.use("/dev", devRoutes);
 
 app.post("/login", async (req, res) => {
     const { email, password, userType } = req.body;

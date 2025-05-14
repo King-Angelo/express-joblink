@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const authController = require('../controllers/authController');
-const { isAuthenticated } = require('../middleware/auth');
+const { authMiddleware } = require('../middleware/authMiddleware');
 
 // @desc    Register new user
 // @route   POST /auth/register
@@ -31,7 +31,7 @@ router.post("/logout", (req, res) => {
 
 // @desc    Get current user
 // @route   GET /auth/me
-router.get("/me", isAuthenticated, async (req, res) => {
+router.get("/me", authMiddleware, async (req, res) => {
     try {
         const user = await User.findById(req.session.userId).select('-password');
         if (!user) {
@@ -45,7 +45,7 @@ router.get("/me", isAuthenticated, async (req, res) => {
 
 // @desc    Delete user and all associated records
 // @route   DELETE /auth/delete
-router.delete("/delete", isAuthenticated, async (req, res) => {
+router.delete("/delete", authMiddleware, async (req, res) => {
     try {
         const { password } = req.body;
         
