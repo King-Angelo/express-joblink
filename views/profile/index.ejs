@@ -161,8 +161,106 @@
                     </p>
                 </div>
             </div>
+
+            <!-- Delete Account Section -->
+            <div class="card mb-4 border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Delete Account</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-danger mb-3">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Warning: This action cannot be undone. All your data will be permanently deleted.
+                    </p>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                        <i class="fas fa-trash-alt"></i> Delete My Account
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteAccountModalLabel">Confirm Account Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete your account? This will:</p>
+                <ul>
+                    <li>Delete your profile information</li>
+                    <li>Delete all your job applications</li>
+                    <li>Delete all your job alerts</li>
+                    <li>Delete all your notifications</li>
+                    <% if (user.userType === 'employer') { %>
+                        <li>Delete your employer profile</li>
+                    <% } %>
+                </ul>
+                <p class="text-danger">This action cannot be undone!</p>
+                
+                <div class="mt-4">
+                    <label for="password" class="form-label">Please enter your password to confirm:</label>
+                    <input type="password" class="form-control" id="password" required>
+                    <div class="invalid-feedback" id="passwordError">
+                        Please enter your password to confirm deletion.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete" disabled>
+                    <i class="fas fa-trash-alt"></i> Yes, Delete My Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this before the closing body tag -->
+<script>
+document.getElementById('password').addEventListener('input', function() {
+    const confirmButton = document.getElementById('confirmDelete');
+    confirmButton.disabled = !this.value.trim();
+});
+
+document.getElementById('confirmDelete').addEventListener('click', async function() {
+    const password = document.getElementById('password').value;
+    const passwordError = document.getElementById('passwordError');
+    
+    if (!password) {
+        passwordError.style.display = 'block';
+        return;
+    }
+    
+    try {
+        const response = await fetch('/auth/delete', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password })
+        });
+
+        if (response.ok) {
+            window.location.href = '/login';
+        } else {
+            const data = await response.json();
+            if (data.error === 'Invalid password') {
+                passwordError.textContent = 'Incorrect password. Please try again.';
+                passwordError.style.display = 'block';
+            } else {
+                alert('Error deleting account: ' + data.error);
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error deleting account. Please try again.');
+    }
+});
+</script>
 
 <%- include('../partials/footer') %> 

@@ -97,6 +97,102 @@ router.get('/browse', authMiddleware, async (req, res) => {
     }
 });
 
+// View agency profile
+router.get('/profile', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user || user.userType !== 'agency') {
+            return res.redirect('/login');
+        }
+
+        const profile = {
+            _id: user._id,
+            companyName: user.agencyProfile?.agencyName,
+            email: user.email,
+            description: user.agencyProfile?.description,
+            location: user.agencyProfile?.address,
+            website: user.agencyProfile?.website,
+            userType: user.userType,
+            companyType: user.agencyProfile?.companyType,
+            foundedYear: user.agencyProfile?.foundedYear,
+            services: user.agencyProfile?.services,
+            specialties: user.agencyProfile?.specialties,
+            phone: user.agencyProfile?.phone
+        };
+
+        res.render('agencies/profile', {
+            profile: profile,
+            user: user
+        });
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        res.status(500).render('error', { message: 'Error loading profile' });
+    }
+});
+
+// Edit agency profile
+router.get('/profile/edit', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user || user.userType !== 'agency') {
+            return res.redirect('/login');
+        }
+
+        res.render('agencies/edit-profile', {
+            user,
+            agency: user.agencyProfile,
+            success: req.query.success,
+            isAuthenticated: true
+        });
+    } catch (error) {
+        console.error('Error loading edit profile:', error);
+        res.status(500).render('error', { message: 'Error loading edit profile' });
+    }
+});
+
+// Update agency profile
+router.post('/profile/edit', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user || user.userType !== 'agency') {
+            return res.redirect('/login');
+        }
+
+        const {
+            agencyName,
+            companyType,
+            description,
+            foundedYear,
+            services,
+            specialties,
+            address,
+            phone,
+            website
+        } = req.body;
+
+        // Update user's agency profile
+        user.agencyProfile = {
+            ...user.agencyProfile,
+            agencyName,
+            companyType,
+            description,
+            foundedYear,
+            services: Array.isArray(services) ? services : [services],
+            specialties,
+            address,
+            phone,
+            website
+        };
+
+        await user.save();
+
+        res.redirect('/agencies/profile/edit?success=true');
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.status(500).render('error', { message: 'Error updating profile' });
+    }
+});
+
 // Get specific agency/employer details
 router.get('/:id', authMiddleware, async (req, res) => {
     try {

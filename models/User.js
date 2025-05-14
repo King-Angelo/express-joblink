@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
 const bcrypt = require('bcryptjs');
+const Employer = require('./Employer');
+const JobApplication = require('./JobApplication');
+const JobAlert = require('./JobAlert');
+const JobAlertPreference = require('./JobAlertPreference');
+const Notification = require('./Notification');
 
 const ExperienceSchema = new mongoose.Schema({
     title: {
@@ -179,6 +184,110 @@ UserSchema.methods.comparePassword = async function(candidatePassword) {
   } catch (error) {
     throw error;
   }
+};
+
+// Add pre-delete middleware to delete associated records
+UserSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
+    try {
+        const userId = this._id;
+        console.log(`Cleaning up associated records for user: ${userId}`);
+
+        // Delete employer record if user is an employer
+        if (this.userType === 'employer') {
+            await Employer.deleteOne({ user: userId });
+            console.log(`Deleted employer record for user: ${userId}`);
+        }
+
+        // Delete all related records
+        await Promise.all([
+            JobApplication.deleteMany({ userId }),
+            JobAlert.deleteMany({ userId }),
+            JobAlertPreference.deleteMany({ userId }),
+            Notification.deleteMany({ user: userId })
+        ]);
+        
+        console.log(`Deleted all related records for user: ${userId}`);
+        next();
+    } catch (error) {
+        console.error('Error in pre-delete middleware:', error);
+        next(error);
+    }
+});
+
+// Add static method to safely delete a user and all associated records
+UserSchema.statics.safeDelete = async function(userId) {
+    try {
+        const user = await this.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        console.log(`Cleaning up associated records for user: ${userId}`);
+
+        // Delete employer record if user is an employer
+        if (user.userType === 'employer') {
+            await Employer.deleteOne({ user: userId });
+            console.log(`Deleted employer record for user: ${userId}`);
+        }
+
+        // Delete all related records
+        await Promise.all([
+            JobApplication.deleteMany({ userId }),
+            JobAlert.deleteMany({ userId }),
+            JobAlertPreference.deleteMany({ userId }),
+            Notification.deleteMany({ user: userId })
+        ]);
+        
+        console.log(`Deleted all related records for user: ${userId}`);
+
+        // Finally delete the user
+        await this.deleteOne({ _id: userId });
+        console.log(`Successfully deleted user: ${userId}`);
+
+        return true;
+    } catch (error) {
+        console.error('Error in safeDelete:', error);
+        throw error;
+    }
+};
+
+// Add safeDelete method to schema
+UserSchema.methods.safeDelete = async function() {
+    try {
+        const userId = this._id;
+        console.log(`Starting safe delete for user: ${userId}`);
+
+        // Delete employer record if user is an employer
+        if (this.userType === 'employer') {
+            await Employer.deleteOne({ user: userId });
+            console.log(`Deleted employer record for user: ${userId}`);
+        }
+
+        // Delete job applications
+        await JobApplication.deleteMany({ user: userId });
+        console.log(`Deleted job applications for user: ${userId}`);
+
+        // Delete job alerts
+        await JobAlert.deleteMany({ user: userId });
+        console.log(`Deleted job alerts for user: ${userId}`);
+
+        // Delete job alert preferences
+        await JobAlertPreference.deleteMany({ user: userId });
+        console.log(`Deleted job alert preferences for user: ${userId}`);
+
+        // Delete notifications
+        await Notification.deleteMany({ user: userId });
+        console.log(`Deleted notifications for user: ${userId}`);
+
+        // Finally, delete the user
+        await this.deleteOne();
+        console.log(`Deleted user: ${userId}`);
+
+        return true;
+    } catch (error) {
+        console.error('Error in safeDelete:', error);
+        throw error;
+    }
 };
 
 const User = mongoose.model("User", UserSchema);
