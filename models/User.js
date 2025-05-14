@@ -200,7 +200,7 @@ UserSchema.pre('deleteOne', { document: true, query: false }, async function(nex
 
         // Delete all related records
         await Promise.all([
-            JobApplication.deleteMany({ userId }),
+            JobApplication.deleteMany({ jobseeker: userId }),
             JobAlert.deleteMany({ userId }),
             JobAlertPreference.deleteMany({ userId }),
             Notification.deleteMany({ user: userId })
@@ -232,7 +232,7 @@ UserSchema.statics.safeDelete = async function(userId) {
 
         // Delete all related records
         await Promise.all([
-            JobApplication.deleteMany({ userId }),
+            JobApplication.deleteMany({ jobseeker: userId }),
             JobAlert.deleteMany({ userId }),
             JobAlertPreference.deleteMany({ userId }),
             Notification.deleteMany({ user: userId })
@@ -264,7 +264,7 @@ UserSchema.methods.safeDelete = async function() {
         }
 
         // Delete job applications
-        await JobApplication.deleteMany({ user: userId });
+        await JobApplication.deleteMany({ jobseeker: userId });
         console.log(`Deleted job applications for user: ${userId}`);
 
         // Delete job alerts
@@ -286,8 +286,8 @@ UserSchema.methods.safeDelete = async function() {
         return true;
     } catch (error) {
         console.error('Error in safeDelete:', error);
-        throw error;
-    }
+    throw error;
+  }
 };
 
 const User = mongoose.model("User", UserSchema);

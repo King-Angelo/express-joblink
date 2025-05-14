@@ -129,6 +129,7 @@
       <div class="nav-buttons">
         <a href="/agency/jobs" class="nav-button">Manage Jobs</a>
         <a href="/agency/candidates" class="nav-button">View Candidates</a>
+        <a href="/agencies/applications" class="nav-button">View Applications</a>
         <a href="/agencies/profile" class="nav-button">Edit Profile</a>
         <a href="/signout" class="nav-button" style="background: #ef4444; color: white;">Sign Out</a>
         </div>
@@ -136,29 +137,67 @@
 
       <div class="stats-grid">
         <div class="stat-card">
-        <h3>Active Jobs</h3>
-        <div class="value"><%= stats.activeJobs %></div>
+          <h3>Active Jobs</h3>
+          <div class="value"><%= stats.activeJobs %></div>
         </div>
         <div class="stat-card">
-        <h3>Total Candidates</h3>
-        <div class="value"><%= stats.totalCandidates %></div>
+          <h3>Total Candidates</h3>
+          <div class="value"><%= stats.totalCandidates %></div>
         </div>
         <div class="stat-card">
-        <h3>Interviews Scheduled</h3>
-        <div class="value"><%= stats.interviewsScheduled %></div>
+          <h3>Interviews Scheduled</h3>
+          <div class="value"><%= stats.interviewsScheduled %></div>
         </div>
         <div class="stat-card">
-        <h3>Successful Placements</h3>
-        <div class="value"><%= stats.placements %></div>
+          <h3>Successful Placements</h3>
+          <div class="value"><%= stats.placements %></div>
         </div>
       </div>
 
-    <div class="activity-section">
-      <h2>Recent Activity</h2>
+      <div class="activity-section">
+        <h2>Recent Applications</h2>
+        <div class="applications-list">
+          <% if (typeof applications !== 'undefined' && applications && applications.length > 0) { %>
+            <% applications.slice(0, 5).forEach(application => { %>
+              <div class="application-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h4 class="mb-1"><%= application.jobseeker ? application.jobseeker.name : 'Unknown Applicant' %></h4>
+                    <p class="mb-0 text-muted">
+                      <i class="fas fa-calendar me-2"></i>
+                      Applied <%= new Date(application.createdAt).toLocaleDateString() %>
+                    </p>
+                  </div>
+                  <div>
+                    <span class="status-badge status-<%= application.status %>">
+                      <%= application.status.charAt(0).toUpperCase() + application.status.slice(1) %>
+                    </span>
+                    <a href="/agencies/applications" class="btn btn-sm btn-outline-primary ms-2">
+                      View Details
+                    </a>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+            <div class="text-center mt-3">
+              <a href="/agencies/applications" class="btn btn-primary">View All Applications</a>
+            </div>
+          <% } else { %>
+            <p class="text-center text-muted">No recent applications</p>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="activity-section">
+        <h2>Recent Activity</h2>
         <ul class="activity-list">
-        <% recentActivity.forEach(activity => { %>
-          <li><%= activity %></li>
-        <% }); %>
+          <% if (typeof recentActivity !== 'undefined' && recentActivity && recentActivity.length > 0) { %>
+            <% recentActivity.forEach(activity => { %>
+              <li><%= activity %></li>
+            <% }); %>
+          <% } else { %>
+            <li class="text-muted">No recent activity</li>
+          <% } %>
         </ul>
       </div>
 

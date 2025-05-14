@@ -32,50 +32,47 @@
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">
+                <% if (success) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i> Profile updated successfully!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% } %>
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
                         <h2 class="card-title mb-0">Edit Agency Profile</h2>
                     </div>
                     <div class="card-body">
-                        <% if (success) { %>
-                            <div class="alert alert-success">
-                                Profile updated successfully!
-                            </div>
-                        <% } %>
-
                         <form action="/agencies/profile/edit" method="POST">
                             <div class="mb-4">
-                                <h4>Basic Information</h4>
-                                <div class="form-group">
-                                    <label for="agencyName">Agency Name</label>
+                                <h4 class="mb-3">Basic Information</h4>
+                                <div class="mb-3">
+                                    <label for="agencyName" class="form-label">Agency Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="agencyName" name="agencyName" value="<%= agency.agencyName %>" required>
                                 </div>
-
-                                <div class="form-group">
-                                    <label for="companyType">Company Type</label>
-                                    <select class="form-control" id="companyType" name="companyType" required>
+                                <div class="mb-3">
+                                    <label for="companyType" class="form-label">Company Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="companyType" name="companyType" required>
                                         <option value="">Select Type</option>
                                         <option value="recruitment" <%= agency.companyType === 'recruitment' ? 'selected' : '' %>>Recruitment Agency</option>
                                         <option value="staffing" <%= agency.companyType === 'staffing' ? 'selected' : '' %>>Staffing Agency</option>
                                         <option value="consulting" <%= agency.companyType === 'consulting' ? 'selected' : '' %>>Consulting Firm</option>
                                     </select>
                                 </div>
-
-                                <div class="form-group">
-                                    <label for="description">Company Description</label>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Company Description <span class="text-danger">*</span></label>
                                     <textarea class="form-control" id="description" name="description" rows="4" required><%= agency.description %></textarea>
                                 </div>
-
-                                <div class="form-group">
-                                    <label for="foundedYear">Year Founded</label>
+                                <div class="mb-3">
+                                    <label for="foundedYear" class="form-label">Year Founded <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control" id="foundedYear" name="foundedYear" value="<%= agency.foundedYear %>" required>
                                 </div>
                             </div>
 
                             <div class="mb-4">
-                                <h4>Services & Specialties</h4>
-                                <div class="form-group">
-                                    <label>Services Offered</label>
+                                <h4 class="mb-3">Services & Specialties</h4>
+                                <div class="mb-3">
+                                    <label class="form-label">Services Offered</label>
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input" id="permanent" name="services" value="permanent" <%= agency.services && agency.services.includes('permanent') ? 'checked' : '' %>>
                                         <label class="form-check-label" for="permanent">Permanent Placement</label>
@@ -90,49 +87,47 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="specialties">Industry Specialties</label>
+                                <div class="mb-3">
+                                    <label for="specialties" class="form-label">Industry Specialties <span class="text-danger">*</span></label>
                                     <textarea class="form-control" id="specialties" name="specialties" rows="4" required><%= agency.specialties %></textarea>
                                 </div>
                             </div>
 
                             <div class="mb-4">
-                                <h4>Contact Information</h4>
-                                <div class="form-group">
-                                    <label for="address">Address</label>
+                                <h4 class="mb-3">Contact Information</h4>
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="address" name="address" value="<%= agency.address %>" required>
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="phone">Phone Number</label>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
                                     <input type="tel" class="form-control" id="phone" name="phone" value="<%= agency.phone %>" required>
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="website">Website</label>
+                                <div class="mb-3">
+                                    <label for="website" class="form-label">Website</label>
                                     <input type="url" class="form-control" id="website" name="website" value="<%= agency.website %>">
                                 </div>
                             </div>
 
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary me-md-2">
                                     <i class="fas fa-save me-2"></i> Save Changes
                                 </button>
-                                <a href="/agencies/profile" class="btn btn-outline-secondary">
-                                    Cancel
-                                </a>
+                                <a href="/agencies/profile" class="btn btn-outline-secondary">Cancel</a>
                             </div>
                         </form>
                     </div>
                 </div>
 
                 <!-- Delete Account Section -->
-                <div class="card mt-4">
+                <div class="card mb-4">
                     <div class="card-header bg-danger text-white">
                         <h5 class="card-title mb-0">Delete Account</h5>
                     </div>
                     <div class="card-body">
-                        <p class="text-danger">
+                        <p class="text-danger mb-3">
                             <i class="fas fa-exclamation-triangle me-2"></i>
                             Warning: This action cannot be undone. All your data will be permanently deleted.
                         </p>
@@ -166,7 +161,7 @@
                     <div class="mt-4">
                         <label for="password" class="form-label">Please enter your password to confirm:</label>
                         <input type="password" class="form-control" id="password" required>
-                        <div class="invalid-feedback" id="passwordError">
+                        <div class="invalid-feedback" id="passwordError" style="display:none;">
                             Please enter your password to confirm deletion.
                         </div>
                     </div>

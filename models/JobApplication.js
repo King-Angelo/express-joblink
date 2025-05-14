@@ -1,46 +1,58 @@
 const mongoose = require('mongoose');
 
 const jobApplicationSchema = new mongoose.Schema({
-    userId: {
+    jobseeker: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    jobTitle: {
+    agencyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
+    targetType: {
+        type: String,
+        enum: ['agency', 'employer'],
+        required: true
+    },
+    message: {
+        type: String,
+        default: ''
+    },
+    resume: {
         type: String,
         required: true
     },
-    company: {
-        type: String,
-        required: true
-    },
-    location: {
-        type: String,
-        required: true
+    coverLetter: {
+        type: String
     },
     status: {
         type: String,
-        enum: ['Pending', 'Reviewed', 'Shortlisted', 'Interview Scheduled', 'Offer Made', 'Rejected', 'Withdrawn'],
-        default: 'Pending'
+        enum: ['pending', 'reviewing', 'interview', 'rejected', 'hired'],
+        default: 'pending'
     },
-    appliedDate: {
+    createdAt: {
         type: Date,
         default: Date.now
     },
-    notes: {
-        type: String
-    },
-    nextSteps: {
-        type: String
-    },
-    interviewDate: {
-        type: Date
-    },
-    salary: {
-        type: String
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
-}, {
-    timestamps: true
 });
 
-module.exports = mongoose.model('JobApplication', jobApplicationSchema); 
+// Update the updatedAt timestamp before saving
+jobApplicationSchema.pre('save', function(next) {
+    this.updatedAt = Date.now();
+    next();
+});
+
+// Add indexes for better query performance
+jobApplicationSchema.index({ agencyId: 1, targetType: 1 });
+jobApplicationSchema.index({ jobseeker: 1 });
+jobApplicationSchema.index({ status: 1 });
+jobApplicationSchema.index({ createdAt: -1 });
+
+const JobApplication = mongoose.model('JobApplication', jobApplicationSchema);
+
+module.exports = JobApplication; 

@@ -97,7 +97,7 @@
         <div class="applications-header">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1>Manage Applications</h1>
-                <a href="/dashboard/employer" class="btn btn-outline-primary">
+                <a href="/dashboard/agency" class="btn btn-outline-primary">
                     <i class="fas fa-arrow-left"></i> Back to Dashboard
                 </a>
             </div>
@@ -157,7 +157,7 @@
         </div>
 
         <div class="filter-section">
-            <form action="/dashboard/employer/applications" method="GET" class="row g-3">
+            <form action="/dashboard/agency/applications" method="GET" class="row g-3">
                 <div class="col-md-3">
                     <label for="status" class="form-label">Status</label>
                     <select class="form-select" id="status" name="status">
@@ -276,7 +276,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form action="/dashboard/employer/applications/<%= application._id %>/status" method="POST">
+                                    <form action="/dashboard/agency/applications/<%= application._id %>/status" method="POST">
                                         <div class="mb-3">
                                             <label for="status" class="form-label">Status</label>
                                             <select class="form-select" id="status" name="status" required>

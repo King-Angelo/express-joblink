@@ -1,10 +1,131 @@
 const express = require('express');
 const router = express.Router();
+const applicationsRouter = express.Router();
 const User = require('../models/User');
 const Employer = require('../models/Employer');
 const JobApplication = require('../models/JobApplication');
 const Notification = require('../models/Notification');
 const { authMiddleware } = require('../middleware/authMiddleware');
+const multer = require('multer');
+const path = require('path');
+
+// Applications routes
+applicationsRouter.get('/', authMiddleware, async (req, res) => {
+    try {
+        // Check if user is an agency or employer
+        if (!['agency', 'employer'].includes(req.user.userType)) {
+            req.flash('error', 'Access denied');
+            return res.redirect('/dashboard');
+        }
+
+        // Get query parameters for filtering
+        const { status, date } = req.query;
+
+        // Build query object
+        const query = {
+            agencyId: req.user._id,
+            targetType: req.user.userType
+        };
+
+        // Add status filter if provided
+        if (status) {
+            query.status = status;
+        }
+
+        // Add date filter if provided
+        if (date) {
+            const now = new Date();
+            switch (date) {
+                case 'today':
+                    query.createdAt = {
+                        $gte: new Date(now.setHours(0, 0, 0, 0))
+                    };
+                    break;
+                case 'week':
+                    query.createdAt = {
+                        $gte: new Date(now.setDate(now.getDate() - 7))
+                    };
+                    break;
+                case 'month':
+                    query.createdAt = {
+                        $gte: new Date(now.setMonth(now.getMonth() - 1))
+                    };
+                    break;
+            }
+        }
+
+        // Get applications with filters
+        const applications = await JobApplication.find(query)
+            .populate('jobseeker', 'name email')
+            .sort({ createdAt: -1 });
+
+        // Get application statistics
+        const stats = {
+            total: applications.length,
+            pending: applications.filter(app => app.status === 'pending').length,
+            reviewing: applications.filter(app => app.status === 'reviewing').length,
+            interview: applications.filter(app => app.status === 'interview').length,
+            rejected: applications.filter(app => app.status === 'rejected').length,
+            hired: applications.filter(app => app.status === 'hired').length
+        };
+
+        res.render('agencies/applications', {
+            user: req.user,
+            applications,
+            stats,
+            query: req.query, // Pass query parameters to the view
+            title: 'Manage Applications',
+            isAuthenticated: true
+        });
+    } catch (error) {
+        console.error('Error fetching applications:', error);
+        req.flash('error', 'Error loading applications');
+        res.redirect('/dashboard');
+    }
+});
+
+applicationsRouter.post('/:applicationId/status', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.userType !== 'agency') {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const application = await JobApplication.findById(req.params.applicationId);
+
+        if (!application) {
+            return res.status(404).json({ error: 'Application not found' });
+        }
+
+        // Verify the application belongs to this agency
+        if (application.agencyId.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const { status } = req.body;
+        application.status = status;
+        await application.save();
+
+        // Create notification for jobseeker
+        const notification = new Notification({
+            recipient: application.jobseeker,
+            sender: req.user._id,
+            type: 'application_status',
+            title: 'Application Status Updated',
+            message: `Your application status has been updated to ${status}`,
+            relatedApplication: application._id
+        });
+
+        await notification.save();
+
+        res.json({ success: true, application });
+    } catch (error) {
+        console.error('Error updating application status:', error);
+        res.status(500).json({ error: 'Error updating application status' });
+    }
+});
+
+// Mount applications router
+router.use('/applications', applicationsRouter);
 
 // Get all agencies and employers
 router.get('/browse', authMiddleware, async (req, res) => {
@@ -264,51 +385,113 @@ router.get('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-// Submit application to agency/employer
-router.post('/:id/apply', authMiddleware, async (req, res) => {
+// Configure multer for file uploads
+const storageApplications = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/applications');
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    // Accept only PDF, DOC, and DOCX files
+    if (file.mimetype === 'application/pdf' || 
+        file.mimetype === 'application/msword' || 
+        file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        cb(null, true);
+    } else {
+        cb(new Error('Invalid file type. Only PDF, DOC, and DOCX files are allowed.'), false);
+    }
+};
+
+const uploadApplications = multer({ 
+    storage: storageApplications,
+    fileFilter: fileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    }
+});
+
+// Handle jobseeker applications to agencies/employers
+router.post('/:id/apply', authMiddleware, uploadApplications.fields([
+    { name: 'resume', maxCount: 1 },
+    { name: 'coverLetter', maxCount: 1 }
+]), async (req, res) => {
     try {
-        const { resume, coverLetter } = req.body;
-        const targetUser = await User.findOne({
-            _id: req.params.id,
-            deletedAt: { $exists: false },
-            'agencyProfile.agencyName': { $exists: true, $ne: '' }
-        });
-        
-        if (!targetUser) {
-            return res.status(404).render('error', { 
-                message: 'Agency/Employer not found',
-                error: { status: 404 }
-            });
+        // Check if user is a jobseeker
+        if (req.user.userType !== 'jobseeker') {
+            req.flash('error', 'Only jobseekers can apply to agencies/employers');
+            return res.redirect(`/agencies/${req.params.id}`);
         }
 
+        const targetId = req.params.id;
+        let targetUser, targetType;
+
+        // First try to find in User model
+        targetUser = await User.findOne({
+            _id: targetId,
+            userType: { $in: ['agency', 'employer'] },
+            deletedAt: { $exists: false }
+        });
+
+        // If not found in User model, try Employer model
+        if (!targetUser) {
+            const employer = await Employer.findById(targetId);
+            if (employer) {
+                targetUser = await User.findById(employer.user);
+                targetType = 'employer';
+            }
+        } else {
+            targetType = targetUser.userType;
+        }
+
+        if (!targetUser) {
+            req.flash('error', 'Agency/Employer not found');
+            return res.redirect('/agencies/browse');
+        }
+
+        // Validate required files
+        if (!req.files || !req.files.resume || !req.files.resume[0]) {
+            req.flash('error', 'Resume is required');
+            return res.redirect(`/agencies/${targetId}`);
+        }
+
+        // Create application record
         const application = new JobApplication({
             jobseeker: req.user._id,
-            agency: req.params.id,
-            resume,
-            coverLetter,
+            agencyId: targetId,
+            targetType: targetType || targetUser.userType,
+            message: req.body.message || '',
+            resume: '/uploads/applications/' + req.files.resume[0].filename,
+            coverLetter: req.files.coverLetter && req.files.coverLetter[0] 
+                ? '/uploads/applications/' + req.files.coverLetter[0].filename 
+                : null,
             status: 'pending'
         });
 
         await application.save();
 
-        // Create notification for the agency/employer
+        // Create notification for agency/employer
         const notification = new Notification({
-            recipient: req.params.id,
+            recipient: targetId,
             sender: req.user._id,
-            type: 'new_application',
-            message: `New application from ${req.user.firstName} ${req.user.lastName}`,
+            type: 'application',
+            title: 'New Job Application',
+            message: `${req.user.name} has applied to work with your ${targetType || targetUser.userType}`,
             relatedApplication: application._id
         });
 
         await notification.save();
 
-        res.redirect('/agencies/browse?success=true');
-    } catch (error) {
-        console.error('Error submitting application:', error);
-        res.status(500).render('error', { 
-            message: 'Error submitting application',
-            error: error
-        });
+        req.flash('success', 'Application submitted successfully');
+        res.redirect(`/agencies/${targetId}`);
+    } catch (err) {
+        console.error('Application submission error:', err);
+        req.flash('error', 'Error submitting application');
+        res.redirect(`/agencies/${req.params.id}`);
     }
 });
 

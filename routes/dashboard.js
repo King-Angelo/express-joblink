@@ -5,6 +5,7 @@ const JobAlert = require('../models/JobAlert');
 const JobApplication = require('../models/JobApplication');
 const Job = require('../models/Job');
 const Employer = require('../models/Employer');
+const Agency = require('../models/Agency');
 
 // Middleware to check if user is authenticated and has the correct user type
 const checkUserType = (allowedTypes) => {
@@ -136,13 +137,90 @@ router.get('/agency', checkUserType(['agency']), async (req, res) => {
             return res.redirect('/login');
         }
 
+        const agency = await Agency.findOne({ user: req.session.userId });
+        if (!agency) {
+            // Create a new agency profile if it doesn't exist
+            const newAgency = new Agency({
+                user: req.session.userId,
+                agencyName: user.agencyName || user.firstName,
+                description: 'No description available',
+                industry: 'Not specified',
+                location: 'Not specified',
+                contactEmail: user.email
+            });
+            await newAgency.save();
+            agency = newAgency;
+        }
+
+        // Get recent applications
+        const applications = await JobApplication.find({ 
+            agencyId: agency._id,
+            targetType: 'agency'
+        })
+        .populate('jobseeker', 'name email')
+        .sort({ createdAt: -1 })
+        .limit(5);
+
+        // Get stats
+        const stats = {
+            activeJobs: await Job.countDocuments({ agencyId: agency._id, status: 'active' }),
+            totalCandidates: await JobApplication.countDocuments({ agencyId: agency._id, targetType: 'agency' }),
+            interviewsScheduled: await JobApplication.countDocuments({ agencyId: agency._id, targetType: 'agency', status: 'interview' }),
+            placements: await JobApplication.countDocuments({ agencyId: agency._id, targetType: 'agency', status: 'hired' })
+        };
+
+        // Get recent activity (last 5 applications)
+        const recentActivity = applications.map(app => 
+            `New application from ${app.jobseeker.name} - ${new Date(app.createdAt).toLocaleDateString()}`
+        );
+
+        // Get chart data (last 6 months of placements)
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+        const monthlyPlacements = await JobApplication.aggregate([
+            {
+                $match: {
+                    agencyId: agency._id,
+                    targetType: 'agency',
+                    status: 'hired',
+                    createdAt: { $gte: sixMonthsAgo }
+                }
+            },
+            {
+                $group: {
+                    _id: { $month: "$createdAt" },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        const chartData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            values: Array(6).fill(0)
+        };
+
+        monthlyPlacements.forEach(placement => {
+            const monthIndex = placement._id - 1;
+            if (monthIndex >= 0 && monthIndex < 6) {
+                chartData.values[monthIndex] = placement.count;
+            }
+        });
+
         res.render('agency/dashboard', {
             user,
-            agencyName: user.agencyProfile?.agencyName
+            agency,
+            agencyName: agency.agencyName,
+            stats,
+            applications,
+            recentActivity,
+            chartData
         });
     } catch (error) {
-        console.error('Agency dashboard error:', error);
-        res.status(500).render('error', { message: 'Error loading agency dashboard' });
+        console.error('Dashboard error:', error);
+        req.flash('error', 'Error loading dashboard');
+        res.redirect('/dashboard');
     }
 });
 
@@ -264,8 +342,10 @@ router.get('/alerts', checkUserType(['jobseeker']), async (req, res) => {
 router.get('/applications', checkUserType(['jobseeker']), async (req, res) => {
     try {
         const applications = await JobApplication.find({
-            userId: req.session.userId
-        }).sort({ appliedDate: -1 });
+            jobseeker: req.session.userId
+        })
+        .populate('agencyId', 'name')
+        .sort({ createdAt: -1 });
 
         const user = await User.findById(req.session.userId);
         res.render('applications', { applications, user });
@@ -461,7 +541,7 @@ router.post("/applications/:id/next-steps", checkUserType(['jobseeker']), async 
     try {
         const { nextSteps, interviewDate } = req.body;
         const application = await JobApplication.findOneAndUpdate(
-            { _id: req.params.id, userId: req.session.userId },
+            { _id: req.params.id, jobseeker: req.session.userId },
             { nextSteps, interviewDate },
             { new: true }
         );
@@ -486,15 +566,13 @@ router.get('/create-sample-application', checkUserType(['jobseeker']), async (re
         }
 
         const sampleApplication = new JobApplication({
-            userId: req.session.userId,
-            jobTitle: "Senior Software Engineer",
-            company: "Tech Innovators Inc.",
-            location: "San Francisco, CA",
-            status: "Pending",
-            appliedDate: new Date(),
-            salary: "$120,000 - $150,000",
-            notes: "Initial application submitted. Following up in a week.",
-            nextSteps: "Prepare for technical interview"
+            jobseeker: req.session.userId,
+            agencyId: '65f1a2b3c4d5e6f7g8h9i0j1', // Replace with a valid agency ID
+            targetType: 'agency',
+            message: 'I am interested in working with your agency',
+            resume: '/uploads/applications/sample-resume.pdf',
+            status: 'pending',
+            nextSteps: 'Prepare for technical interview'
         });
 
         await sampleApplication.save();
@@ -529,6 +607,78 @@ router.get("/", checkUserType(['jobseeker']), async (req, res) => {
             message: "Error loading dashboard",
             error: error.message
         });
+    }
+});
+
+// Employer Applications
+router.get('/employer/applications', checkUserType(['employer']), async (req, res) => {
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            return res.redirect('/login');
+        }
+
+        // Get query parameters for filtering
+        const { status, date } = req.query;
+
+        // Build query object
+        const query = {
+            agencyId: req.session.userId,
+            targetType: 'employer'
+        };
+
+        // Add status filter if provided
+        if (status) {
+            query.status = status;
+        }
+
+        // Add date filter if provided
+        if (date) {
+            const now = new Date();
+            switch (date) {
+                case 'today':
+                    query.createdAt = {
+                        $gte: new Date(now.setHours(0, 0, 0, 0))
+                    };
+                    break;
+                case 'week':
+                    query.createdAt = {
+                        $gte: new Date(now.setDate(now.getDate() - 7))
+                    };
+                    break;
+                case 'month':
+                    query.createdAt = {
+                        $gte: new Date(now.setMonth(now.getMonth() - 1))
+                    };
+                    break;
+            }
+        }
+
+        // Get applications with filters
+        const applications = await JobApplication.find(query)
+            .populate('jobseeker', 'name email')
+            .sort({ createdAt: -1 });
+
+        // Get application statistics
+        const stats = {
+            total: applications.length,
+            pending: applications.filter(app => app.status === 'pending').length,
+            reviewing: applications.filter(app => app.status === 'reviewing').length,
+            interview: applications.filter(app => app.status === 'interview').length,
+            rejected: applications.filter(app => app.status === 'rejected').length,
+            hired: applications.filter(app => app.status === 'hired').length
+        };
+
+        res.render('employer/applications', {
+            applications,
+            stats,
+            query: req.query,
+            title: 'Manage Applications',
+            isAuthenticated: true
+        });
+    } catch (error) {
+        console.error('Error loading employer applications:', error);
+        res.status(500).render('error', { message: 'Error loading employer applications' });
     }
 });
 

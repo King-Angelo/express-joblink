@@ -133,13 +133,61 @@ router.post('/jobs', authMiddleware, isEmployer, async (req, res) => {
 // Application Management
 router.get('/applications', authMiddleware, isEmployer, async (req, res) => {
     try {
-        const jobs = await Job.find({ employer: req.employer._id });
-        const applications = await JobApplication.find({
-            job: { $in: jobs.map(job => job._id) }
-        }).populate('job user');
-        
+        // Get query parameters for filtering
+        const { status, date } = req.query;
+
+        // Build query object
+        const query = {
+            agencyId: req.employer._id,
+            targetType: 'employer'
+        };
+
+        // Add status filter if provided
+        if (status) {
+            query.status = status;
+        }
+
+        // Add date filter if provided
+        if (date) {
+            const now = new Date();
+            switch (date) {
+                case 'today':
+                    query.createdAt = {
+                        $gte: new Date(now.setHours(0, 0, 0, 0))
+                    };
+                    break;
+                case 'week':
+                    query.createdAt = {
+                        $gte: new Date(now.setDate(now.getDate() - 7))
+                    };
+                    break;
+                case 'month':
+                    query.createdAt = {
+                        $gte: new Date(now.setMonth(now.getMonth() - 1))
+                    };
+                    break;
+            }
+        }
+
+        // Get applications with filters
+        const applications = await JobApplication.find(query)
+            .populate('jobseeker', 'name email')
+            .sort({ createdAt: -1 });
+
+        // Get application statistics
+        const stats = {
+            total: applications.length,
+            pending: applications.filter(app => app.status === 'pending').length,
+            reviewing: applications.filter(app => app.status === 'reviewing').length,
+            interview: applications.filter(app => app.status === 'interview').length,
+            rejected: applications.filter(app => app.status === 'rejected').length,
+            hired: applications.filter(app => app.status === 'hired').length
+        };
+
         res.render('employer/applications', {
             applications,
+            stats,
+            query: req.query, // Pass query parameters to the view
             title: 'Manage Applications',
             isAuthenticated: true
         });
@@ -149,10 +197,20 @@ router.get('/applications', authMiddleware, isEmployer, async (req, res) => {
     }
 });
 
+// Add route for /dashboard/employer/applications
+router.get('/dashboard/employer/applications', authMiddleware, isEmployer, async (req, res) => {
+    // Redirect to the main applications route
+    res.redirect('/employer/applications');
+});
+
 router.post('/applications/:id/status', authMiddleware, isEmployer, async (req, res) => {
     try {
         const { status } = req.body;
-        const application = await JobApplication.findById(req.params.id);
+        const application = await JobApplication.findOne({
+            _id: req.params.id,
+            agencyId: req.employer._id,
+            targetType: 'employer'
+        });
         
         if (!application) {
             req.flash('error', 'Application not found');
@@ -164,10 +222,12 @@ router.post('/applications/:id/status', authMiddleware, isEmployer, async (req, 
         
         // Create notification for the applicant
         const notification = new Notification({
-            user: application.user,
+            recipient: application.jobseeker,
+            sender: req.employer._id,
             type: 'application_status',
+            title: 'Application Status Updated',
             message: `Your application status has been updated to ${status}`,
-            relatedTo: application._id
+            relatedApplication: application._id
         });
         await notification.save();
         
@@ -294,6 +354,98 @@ router.post('/register', async (req, res) => {
     } catch (err) {
         console.error('Employer registration error:', err);
         res.render('employer/register', { error: 'Something went wrong. Please try again.' });
+    }
+});
+
+// Configure multer for file uploads
+const storageApplications = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/applications');
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    // Accept only PDF, DOC, and DOCX files
+    if (file.mimetype === 'application/pdf' || 
+        file.mimetype === 'application/msword' || 
+        file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        cb(null, true);
+    } else {
+        cb(new Error('Invalid file type. Only PDF, DOC, and DOCX files are allowed.'), false);
+    }
+};
+
+const uploadApplications = multer({ 
+    storage: storageApplications,
+    fileFilter: fileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    }
+});
+
+// Handle jobseeker applications
+router.post('/:employerId/apply', authMiddleware, uploadApplications.fields([
+    { name: 'resume', maxCount: 1 },
+    { name: 'coverLetter', maxCount: 1 }
+]), async (req, res) => {
+    try {
+        // Check if user is a jobseeker
+        if (req.user.userType !== 'jobseeker') {
+            req.flash('error', 'Only jobseekers can apply to employers');
+            return res.redirect('back');
+        }
+
+        const employerId = req.params.employerId;
+        const employer = await Employer.findById(employerId);
+        
+        if (!employer) {
+            req.flash('error', 'Employer not found');
+            return res.redirect('back');
+        }
+
+        // Validate required files
+        if (!req.files || !req.files.resume || !req.files.resume[0]) {
+            req.flash('error', 'Resume is required');
+            return res.redirect('back');
+        }
+
+        // Create application record
+        const application = new JobApplication({
+            jobseeker: req.user._id,
+            agencyId: employerId,
+            targetType: 'employer',
+            message: req.body.message || '',
+            resume: '/uploads/applications/' + req.files.resume[0].filename,
+            coverLetter: req.files.coverLetter && req.files.coverLetter[0] 
+                ? '/uploads/applications/' + req.files.coverLetter[0].filename 
+                : null,
+            status: 'pending'
+        });
+
+        await application.save();
+
+        // Create notification for employer
+        const notification = new Notification({
+            recipient: employer.user,
+            sender: req.user._id,
+            type: 'application',
+            title: 'New Job Application',
+            message: `${req.user.name} has applied to work with your company`,
+            relatedApplication: application._id
+        });
+
+        await notification.save();
+
+        req.flash('success', 'Application submitted successfully');
+        res.redirect(`/employers/${employerId}`);
+    } catch (err) {
+        console.error('Application submission error:', err);
+        req.flash('error', 'Error submitting application');
+        res.redirect('back');
     }
 });
 
