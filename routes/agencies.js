@@ -314,6 +314,11 @@ router.post('/profile/edit', authMiddleware, async (req, res) => {
     }
 });
 
+// Place this BEFORE router.get('/:id', ...)
+router.get('/test', (req, res) => {
+  res.send('Agencies router is working!');
+});
+
 // Get specific agency/employer details
 router.get('/:id', authMiddleware, async (req, res) => {
     try {
@@ -492,6 +497,66 @@ router.post('/:id/apply', authMiddleware, uploadApplications.fields([
         console.error('Application submission error:', err);
         req.flash('error', 'Error submitting application');
         res.redirect(`/agencies/${req.params.id}`);
+    }
+});
+
+// List all jobs for the logged-in agency
+router.get('/agency/jobs', authMiddleware, async (req, res) => {
+    try {
+        const agency = await User.findById(req.session.userId);
+        if (!agency) return res.redirect('/login');
+        const jobs = await require('../models/Job').find({ agencyId: agency._id });
+        res.render('agencies/agency/jobs', { jobs, user: agency, title: 'Manage Jobs', isAuthenticated: true });
+    } catch (err) {
+        console.error('Agency jobs error:', err);
+        res.status(500).render('error', { message: 'Error loading agency jobs' });
+    }
+});
+
+// List all candidates who applied to the agency's jobs
+router.get('/agency/candidates', authMiddleware, async (req, res) => {
+    try {
+        const agency = await User.findById(req.session.userId);
+        if (!agency) return res.redirect('/login');
+        const jobs = await require('../models/Job').find({ agencyId: agency._id });
+        const jobIds = jobs.map(job => job._id);
+        const applications = await require('../models/JobApplication').find({ agencyId: agency._id, targetType: 'agency' })
+            .populate('jobseeker');
+        res.render('agencies/agency/candidates', { applications, user: agency, title: 'View Candidates', isAuthenticated: true });
+    } catch (err) {
+        console.error('Agency candidates error:', err);
+        res.status(500).render('error', { message: 'Error loading candidates' });
+    }
+});
+
+// Add this to routes/agencies.js
+router.get('/agency/applications', authMiddleware, async (req, res) => {
+    try {
+        // Fetch applications for the logged-in agency
+        const agency = await User.findById(req.session.userId);
+        if (!agency) return res.redirect('/login');
+        const applications = await require('../models/JobApplication').find({ agencyId: agency._id, targetType: 'agency' })
+            .populate('jobseeker');
+        // Calculate stats as in your previous logic
+        const stats = {
+            total: applications.length,
+            pending: applications.filter(app => app.status === 'pending').length,
+            reviewing: applications.filter(app => app.status === 'reviewing').length,
+            interview: applications.filter(app => app.status === 'interview').length,
+            rejected: applications.filter(app => app.status === 'rejected').length,
+            hired: applications.filter(app => app.status === 'hired').length
+        };
+        res.render('agencies/agency/applications', {
+            applications,
+            stats,
+            user: agency,
+            title: 'Manage Applications',
+            isAuthenticated: true,
+            query: req.query
+        });
+    } catch (err) {
+        console.error('Agency applications error:', err);
+        res.status(500).render('error', { message: 'Error loading agency applications' });
     }
 });
 

@@ -272,19 +272,38 @@ app.post("/register/jobseeker", async (req, res) => {
             return res.render("register", { error: "Email already registered", userType: 'jobseeker' });
         }
 
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const user = new User({
             firstName,
             lastName,
             email,
-            password, // The pre-save middleware will hash this
-            userType: 'jobseeker'
+            password: hashedPassword,
+            userType: 'jobseeker',
+            name: `${firstName} ${lastName}`
         });
 
         await user.save();
+        
+        // Set session data
         req.session.userId = user._id;
         req.session.userType = 'jobseeker';
+        req.session.user = {
+            id: user._id,
+            email: user.email,
+            firstName: user.firstName,
+            userType: 'jobseeker'
+        };
 
-        return res.redirect('/dashboard');
+        // Save session before redirect
+        req.session.save((err) => {
+            if (err) {
+                console.error("Session save error:", err);
+                return res.render("register", { error: "Registration failed", userType: 'jobseeker' });
+            }
+            return res.redirect('/dashboard');
+        });
     } catch (err) {
         console.error('Jobseeker registration error:', err);
         console.log("Rendering register with error (registration failed) - jobseeker", { userType: 'jobseeker' });
@@ -491,7 +510,7 @@ app.get("/agency/dashboard", authMiddleware, async (req, res) => {
             }
         };
 
-        res.render("agency/dashboard", dashboardData);
+        res.render("agencies/agency/dashboard", dashboardData);
     } catch (err) {
         console.error("Agency dashboard error:", err);
         res.status(500).render("error", { error: "Dashboard failed to load" });

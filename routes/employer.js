@@ -40,25 +40,49 @@ const isEmployer = async (req, res, next) => {
 // Employer Dashboard
 router.get('/dashboard', authMiddleware, isEmployer, async (req, res) => {
     try {
-        const employer = req.employer;
-        const user = await User.findById(req.session.userId);
-        const jobs = await Job.find({ employer: employer._id });
-        const applications = await JobApplication.find({ 
-            job: { $in: jobs.map(job => job._id) }
-        }).populate('job user');
-        
+        if (!req.employer) {
+            console.error('No employer found for user:', req.session.userId);
+            return res.status(404).render('error', { message: 'Employer profile not found.' });
+        }
+        // Pagination params
+        const jobsPage = parseInt(req.query.jobsPage) || 1;
+        const appsPage = parseInt(req.query.appsPage) || 1;
+        const jobsLimit = 5;
+        const appsLimit = 5;
+
+        // Fetch paginated jobs for this employer
+        const jobsCount = await Job.countDocuments({ employer: req.employer._id });
+        const jobs = await Job.find({ employer: req.employer._id })
+            .sort({ postedDate: -1 })
+            .skip((jobsPage - 1) * jobsLimit)
+            .limit(jobsLimit);
+
+        // Defensive: handle no jobs
+        const jobIds = jobs && jobs.length > 0 ? jobs.map(job => job._id) : [];
+        const appsQuery = jobIds.length > 0 ? { job: { $in: jobIds } } : { job: null };
+        const appsCount = await JobApplication.countDocuments(appsQuery);
+        const applications = await JobApplication.find(appsQuery)
+            .populate('jobseeker')
+            .sort({ createdAt: -1 })
+            .skip((appsPage - 1) * appsLimit)
+            .limit(appsLimit);
+
         res.render('employer/dashboard', {
-            employer,
-            user,
-            firstName: user.firstName,
+            user: req.user,
             jobs,
+            jobsCount,
+            jobsPage,
+            jobsTotalPages: Math.ceil(jobsCount / jobsLimit),
             applications,
+            appsCount,
+            appsPage,
+            appsTotalPages: Math.ceil(appsCount / appsLimit),
             title: 'Employer Dashboard',
             isAuthenticated: true
         });
     } catch (err) {
-        console.error('Employer dashboard error:', err);
-        res.status(500).send('Server Error');
+        console.error('Employer dashboard error:', err.stack || err);
+        res.status(500).render('error', { message: 'Error loading employer dashboard' });
     }
 });
 
@@ -68,8 +92,10 @@ router.get('/profile', authMiddleware, isEmployer, async (req, res) => {
         const employer = req.employer;
         res.render('employer/profile', {
             employer,
+            user: req.user,
             title: 'Employer Profile',
-            isAuthenticated: true
+            isAuthenticated: true,
+            success: req.query.success || null
         });
     } catch (err) {
         console.error('Profile view error:', err);
@@ -117,10 +143,18 @@ router.post('/jobs', authMiddleware, isEmployer, async (req, res) => {
             ...req.body,
             employer: req.employer._id
         };
-        
+
+        // Parse requirements and skills as arrays if they are comma-separated strings
+        if (typeof jobData.requirements === 'string') {
+            jobData.requirements = jobData.requirements.split(',').map(r => r.trim()).filter(Boolean);
+        }
+        if (typeof jobData.skills === 'string') {
+            jobData.skills = jobData.skills.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
         const job = new Job(jobData);
         await job.save();
-        
+
         req.flash('success', 'Job posted successfully');
         res.redirect('/employer/jobs');
     } catch (err) {
@@ -446,6 +480,84 @@ router.post('/:employerId/apply', authMiddleware, uploadApplications.fields([
         console.error('Application submission error:', err);
         req.flash('error', 'Error submitting application');
         res.redirect('back');
+    }
+});
+
+// Placeholder: Employer Jobs
+router.get('/jobs', authMiddleware, isEmployer, async (req, res) => {
+    // Fetch jobs for this employer
+    const jobs = await Job.find({ employer: req.employer._id });
+    res.render('employer/jobs', { jobs, title: 'Manage Jobs', isAuthenticated: true });
+});
+
+// Candidates page: show all jobseekers who applied to this employer's jobs
+router.get('/candidates', authMiddleware, isEmployer, async (req, res) => {
+    try {
+        // Find all jobs for this employer
+        const jobs = await Job.find({ employer: req.employer._id });
+        const jobIds = jobs.map(job => job._id);
+        // Find all applications for these jobs
+        const candidates = await JobApplication.find({ job: { $in: jobIds } })
+            .populate('jobseeker')
+        res.render('employer/candidates', {
+            candidates,
+            user: req.user,
+            title: 'Candidates',
+            isAuthenticated: true
+        });
+    } catch (err) {
+        console.error('Candidates view error:', err);
+        res.status(500).render('error', { message: 'Error loading candidates' });
+    }
+});
+
+// Update application status from candidates page
+router.post('/candidates/:applicationId/status', authMiddleware, isEmployer, async (req, res) => {
+    try {
+        const { status } = req.body;
+        await JobApplication.findByIdAndUpdate(req.params.applicationId, { status });
+        res.redirect('/employer/candidates');
+    } catch (err) {
+        console.error('Update status error:', err);
+        res.status(500).render('error', { message: 'Error updating status' });
+    }
+});
+
+// Placeholder: Employer Settings
+router.get('/settings', authMiddleware, isEmployer, (req, res) => {
+    res.render('employer/settings', { title: 'Settings', isAuthenticated: true, user: req.user });
+});
+
+// Change password
+router.post('/settings/password', authMiddleware, isEmployer, async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.session.userId);
+        if (!user) return res.redirect('/employer/settings?error=notfound');
+        const valid = await require('bcryptjs').compare(currentPassword, user.password);
+        if (!valid) return res.redirect('/employer/settings?error=invalid');
+        user.password = await require('bcryptjs').hash(newPassword, 10);
+        await user.save();
+        res.redirect('/employer/settings?success=password');
+    } catch (err) {
+        console.error('Change password error:', err);
+        res.redirect('/employer/settings?error=server');
+    }
+});
+
+// Save notification preferences
+router.post('/settings/notifications', authMiddleware, isEmployer, async (req, res) => {
+    try {
+        const notifyNewApplications = !!req.body.notifyNewApplications;
+        const notifyStatusUpdates = !!req.body.notifyStatusUpdates;
+        await User.findByIdAndUpdate(req.session.userId, {
+            notifyNewApplications,
+            notifyStatusUpdates
+        });
+        res.redirect('/employer/settings?success=notifications');
+    } catch (err) {
+        console.error('Notification prefs error:', err);
+        res.redirect('/employer/settings?error=server');
     }
 });
 

@@ -91,7 +91,7 @@
     </style>
 </head>
 <body>
-    <%- include('../partials/navbar') %>
+    <%- include('../../partials/navbar', { isAuthenticated: true, user: user }) %>
 
     <div class="applications-container">
         <div class="applications-header">

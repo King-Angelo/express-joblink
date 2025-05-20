@@ -11,6 +11,106 @@ const isAuthenticated = (req, res, next) => {
     res.redirect('/login');
 };
 
+// Create sample jobs (for testing)
+router.get('/create-sample-jobs', async (req, res) => {
+    try {
+        const sampleJobs = [
+            {
+                title: "Senior Software Engineer",
+                company: "Tech Innovations Inc",
+                location: "San Francisco, CA",
+                type: "Full-time",
+                description: "We are looking for a Senior Software Engineer to join our team. The ideal candidate should have strong experience in full-stack development and cloud technologies.",
+                requirements: [
+                    "5+ years of software development experience",
+                    "Strong knowledge of JavaScript, Python, and cloud platforms",
+                    "Experience with microservices architecture",
+                    "Bachelor's degree in Computer Science or related field"
+                ],
+                salary: "$120,000 - $150,000",
+                skills: ["JavaScript", "Python", "AWS", "Docker", "Kubernetes"],
+                category: "Engineering"
+            },
+            {
+                title: "Frontend Developer",
+                company: "Web Solutions Ltd",
+                location: "Remote",
+                type: "Full-time",
+                description: "Join our team as a Frontend Developer and help build beautiful, responsive web applications. We're looking for someone passionate about user experience and modern web technologies.",
+                requirements: [
+                    "3+ years of frontend development experience",
+                    "Proficiency in React.js and modern JavaScript",
+                    "Experience with responsive design and CSS frameworks",
+                    "Strong understanding of web performance optimization"
+                ],
+                salary: "$90,000 - $110,000",
+                skills: ["React", "JavaScript", "HTML", "CSS", "TypeScript"],
+                category: "Frontend Development"
+            },
+            {
+                title: "Data Scientist",
+                company: "Analytics Pro",
+                location: "New York, NY",
+                type: "Full-time",
+                description: "We're seeking a Data Scientist to help us extract insights from large datasets and build predictive models. The ideal candidate should have strong statistical and machine learning skills.",
+                requirements: [
+                    "Master's degree in Statistics, Computer Science, or related field",
+                    "3+ years of experience in data science",
+                    "Proficiency in Python and R",
+                    "Experience with machine learning frameworks"
+                ],
+                salary: "$100,000 - $130,000",
+                skills: ["Python", "R", "Machine Learning", "Statistics", "SQL"],
+                category: "Data Science"
+            },
+            {
+                title: "DevOps Engineer",
+                company: "Cloud Systems Inc",
+                location: "Austin, TX",
+                type: "Full-time",
+                description: "Join our DevOps team to help build and maintain our cloud infrastructure. We're looking for someone with strong experience in automation and cloud platforms.",
+                requirements: [
+                    "4+ years of DevOps experience",
+                    "Strong knowledge of AWS or Azure",
+                    "Experience with CI/CD pipelines",
+                    "Proficiency in infrastructure as code"
+                ],
+                salary: "$110,000 - $140,000",
+                skills: ["AWS", "Docker", "Kubernetes", "Terraform", "Jenkins"],
+                category: "DevOps"
+            },
+            {
+                title: "UX/UI Designer",
+                company: "Creative Design Studio",
+                location: "Los Angeles, CA",
+                type: "Full-time",
+                description: "We're looking for a talented UX/UI Designer to create beautiful and intuitive user interfaces. The ideal candidate should have a strong portfolio and experience with design tools.",
+                requirements: [
+                    "3+ years of UX/UI design experience",
+                    "Proficiency in Figma and Adobe Creative Suite",
+                    "Strong portfolio showcasing web and mobile designs",
+                    "Experience with user research and testing"
+                ],
+                salary: "$85,000 - $105,000",
+                skills: ["Figma", "Adobe XD", "UI Design", "UX Research", "Prototyping"],
+                category: "Design"
+            }
+        ];
+
+        // Insert sample jobs
+        await Job.insertMany(sampleJobs);
+
+        res.redirect('/jobs');
+    } catch (error) {
+        console.error('Error creating sample jobs:', error);
+        res.status(500).render('error', { 
+            title: 'Error',
+            message: 'Error creating sample jobs',
+            error: error.message 
+        });
+    }
+});
+
 // Get recommended jobs based on user preferences and skills
 router.get('/recommended', isAuthenticated, async (req, res) => {
     try {
@@ -87,7 +187,13 @@ router.get('/', async (req, res) => {
         let searchQuery = { isActive: true };
         
         if (req.query.search) {
-            searchQuery.$text = { $search: req.query.search };
+            // Search in title, company, skills, and description
+            searchQuery.$or = [
+                { title: { $regex: new RegExp(req.query.search, 'i') } },
+                { company: { $regex: new RegExp(req.query.search, 'i') } },
+                { skills: { $in: [new RegExp(req.query.search, 'i')] } },
+                { description: { $regex: new RegExp(req.query.search, 'i') } }
+            ];
         }
         if (req.query.type) {
             searchQuery.type = req.query.type;

@@ -4,22 +4,26 @@ const jobSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        index: true
     },
     company: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        index: true
     },
     location: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        index: true
     },
     type: {
         type: String,
         enum: ['Full-time', 'Part-time', 'Contract', 'Remote', 'Internship'],
-        required: true
+        required: true,
+        index: true
     },
     description: {
         type: String,
@@ -35,25 +39,31 @@ const jobSchema = new mongoose.Schema({
     },
     skills: [{
         type: String,
-        required: true
+        required: true,
+        index: true
     }],
     category: {
         type: String,
-        required: true
+        required: true,
+        index: true
     },
     postedDate: {
         type: Date,
-        default: Date.now
+        default: Date.now,
+        index: true
     },
     isActive: {
         type: Boolean,
-        default: true
+        default: true,
+        index: true
     }
 }, {
     timestamps: true
 });
 
-// Create indexes for better search performance
-jobSchema.index({ title: 'text', company: 'text', skills: 'text', category: 'text' });
+// Create compound indexes for better search performance
+jobSchema.index({ title: 1, company: 1, location: 1 });
+jobSchema.index({ skills: 1, type: 1, location: 1 });
+jobSchema.index({ category: 1, type: 1, isActive: 1 });
 
 module.exports = mongoose.model('Job', jobSchema); 

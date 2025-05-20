@@ -67,22 +67,22 @@
         <div class="sidebar">
             <div class="logo">JobLink</div>
             <nav>
-                <a href="/dashboard/employer" class="nav-item active">
+                <a href="/employer/dashboard" class="nav-item active">
                     <i>📊</i> Dashboard
                 </a>
-                <a href="/dashboard/employer/jobs" class="nav-item">
+                <a href="/employer/jobs" class="nav-item">
                     <i>💼</i> Job Postings
                 </a>
-                <a href="/dashboard/employer/applications" class="nav-item">
+                <a href="/employer/applications" class="nav-item">
                     <i>📝</i> Applications
                 </a>
-                <a href="/dashboard/employer/candidates" class="nav-item">
+                <a href="/employer/candidates" class="nav-item">
                     <i>👥</i> Candidates
                 </a>
-                <a href="/dashboard/employer/profile" class="nav-item">
+                <a href="/employer/profile" class="nav-item">
                     <i>🏢</i> Company Profile
                 </a>
-                <a href="/dashboard/employer/settings" class="nav-item">
+                <a href="/employer/settings" class="nav-item">
                     <i>⚙️</i> Settings
                 </a>
                 <a href="/signout" class="nav-item" style="color: var(--danger);">
@@ -121,73 +121,71 @@
             <div class="job-postings">
                 <div class="section-title">Recent Job Postings</div>
                 <div class="job-list">
-                    <div class="job-item">
-                        <div class="job-header">
-                            <div class="job-title">Senior Frontend Developer</div>
-                            <button class="btn btn-secondary">View Details</button>
-                        </div>
-                        <div class="job-meta">
-                            <span>📍 Remote</span>
-                            <span>💰 $120k - $150k</span>
-                            <span>⏰ Full Time</span>
-                        </div>
-                        <div class="job-stats">
-                            <div class="stat">👥 24 Applicants</div>
-                            <div class="stat">📅 Posted 2 days ago</div>
-                        </div>
-                    </div>
-                    <div class="job-item">
-                        <div class="job-header">
-                            <div class="job-title">Backend Engineer</div>
-                            <button class="btn btn-secondary">View Details</button>
-                        </div>
-                        <div class="job-meta">
-                            <span>📍 New York</span>
-                            <span>💰 $100k - $130k</span>
-                            <span>⏰ Full Time</span>
-                        </div>
-                        <div class="job-stats">
-                            <div class="stat">👥 18 Applicants</div>
-                            <div class="stat">📅 Posted 5 days ago</div>
-                        </div>
-                    </div>
+                    <% if (jobs && jobs.length > 0) { %>
+                        <% jobs.forEach(function(job) { %>
+                            <div class="job-item">
+                                <div class="job-header">
+                                    <div class="job-title"><%= job.title %></div>
+                                    <a href="/employer/jobs/<%= job._id %>" class="btn btn-secondary">View Details</a>
+                                </div>
+                                <div class="job-meta">
+                                    <span>📍 <%= job.location %></span>
+                                    <span>💰 <%= job.salary %></span>
+                                    <span>⏰ <%= job.type %></span>
+                                </div>
+                                <div class="job-stats">
+                                    <div class="stat">📅 Posted <%= job.postedDate ? new Date(job.postedDate).toLocaleDateString() : '' %></div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="alert alert-info">No jobs posted yet.</div>
+                    <% } %>
                 </div>
+                <% if (jobsTotalPages > 1) { %>
+                    <nav class="mt-3">
+                        <ul class="pagination">
+                            <% for (let i = 1; i <= jobsTotalPages; i++) { %>
+                                <li class="page-item <%= jobsPage === i ? 'active' : '' %>">
+                                    <a class="page-link" href="?jobsPage=<%= i %>&appsPage=<%= appsPage %>"><%= i %></a>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </nav>
+                <% } %>
             </div>
             <!-- Candidate Applications -->
             <div class="applications">
                 <div class="section-title">Recent Applications</div>
                 <div class="application-list">
-                    <div class="application-item">
-                        <div class="candidate-info">
-                            <div class="candidate-name">John Smith</div>
-                            <div class="application-status status-new">New</div>
-                        </div>
-                        <div class="candidate-meta">
-                            <span>💼 Senior Frontend Developer</span>
-                            <span>📅 Applied 2 hours ago</span>
-                        </div>
-                    </div>
-                    <div class="application-item">
-                        <div class="candidate-info">
-                            <div class="candidate-name">Sarah Johnson</div>
-                            <div class="application-status status-review">Under Review</div>
-                        </div>
-                        <div class="candidate-meta">
-                            <span>💼 Backend Engineer</span>
-                            <span>📅 Applied 1 day ago</span>
-                        </div>
-                    </div>
-                    <div class="application-item">
-                        <div class="candidate-info">
-                            <div class="candidate-name">Michael Brown</div>
-                            <div class="application-status status-interview">Interview Scheduled</div>
-                        </div>
-                        <div class="candidate-meta">
-                            <span>💼 Senior Frontend Developer</span>
-                            <span>📅 Applied 3 days ago</span>
-                        </div>
-                    </div>
+                    <% if (applications && applications.length > 0) { %>
+                        <% applications.forEach(function(app) { %>
+                            <div class="application-item">
+                                <div class="candidate-info">
+                                    <div class="candidate-name"><%= app.jobseeker?.name || 'N/A' %></div>
+                                    <div class="application-status status-<%= app.status %>"><%= app.status ? app.status.charAt(0).toUpperCase() + app.status.slice(1) : 'N/A' %></div>
+                                </div>
+                                <div class="candidate-meta">
+                                    <span>💼 <%= app.job?.title || 'N/A' %></span>
+                                    <span>📅 Applied <%= app.createdAt ? new Date(app.createdAt).toLocaleDateString() : '' %></span>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="alert alert-info">No recent applications.</div>
+                    <% } %>
                 </div>
+                <% if (appsTotalPages > 1) { %>
+                    <nav class="mt-3">
+                        <ul class="pagination">
+                            <% for (let i = 1; i <= appsTotalPages; i++) { %>
+                                <li class="page-item <%= appsPage === i ? 'active' : '' %>">
+                                    <a class="page-link" href="?jobsPage=<%= jobsPage %>&appsPage=<%= i %>"><%= i %></a>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </nav>
+                <% } %>
             </div>
         </div>
     </div>
