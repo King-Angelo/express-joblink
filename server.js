@@ -309,21 +309,21 @@ app.post("/agency/create", async (req, res) => {
 
         // Create User document
         const user = new User({
-            firstName: agencyName, // Using agency name as first name
-            lastName: "", // Empty last name for agency
-            email,
+            firstName: agencyName.trim(), // Using agency name as first name
+            lastName: "Agency".trim(), // Default lastName for agencies with proper trim
+            email: email.trim(),
             password, // The pre-save middleware will hash this
             userType: 'agency',
             agencyProfile: {
-                agencyName,
+                agencyName: agencyName.trim(),
                 companyType,
-                description,
+                description: description?.trim(),
                 foundedYear,
                 services: Array.isArray(services) ? services : [services],
-                specialties,
-                address,
-                phone,
-                website
+                specialties: specialties?.trim(),
+                address: address?.trim(),
+                phone: phone?.trim(),
+                website: website?.trim()
             }
         });
 
@@ -444,7 +444,7 @@ app.post("/reset-password", async (req, res) => {
 });
 
 // Agency Dashboard
-app.get("/agency/dashboard", async (req, res) => {
+app.get("/agency/dashboard", authMiddleware, async (req, res) => {
     if (!req.session.userId || req.session.userType !== 'agency') {
         return res.redirect('/login');
     }
