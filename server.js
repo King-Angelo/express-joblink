@@ -46,6 +46,98 @@ app.use(session({
     }
 }));
 
+app.post("/register/agency", async (req, res) => {
+    const {
+        agencyName,
+        email,
+        password,
+        companyType,
+        description,
+        foundedYear,
+        services,
+        specialties,
+        address,
+        phone,
+        website
+    } = req.body;
+    console.log("Agency registration attempt:", { email, agencyName });
+
+    try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            console.log("Email already registered:", email);
+            return res.render("agency-profile", { error: "Email already registered", userType: 'agency' });
+        }
+
+        // Create User document
+        const user = new User({
+            firstName: agencyName.trim(), // Using agency name as first name
+            lastName: "Agency".trim(), // Default lastName for agencies with proper trim
+            email: email.trim(),
+            password, // The pre-save middleware will hash this
+            userType: 'agency',
+            agencyProfile: {
+                agencyName: agencyName.trim(),
+                companyType,
+                description: description?.trim(),
+                foundedYear,
+                services: Array.isArray(services) ? services : [services],
+                specialties: specialties?.trim(),
+                address: address?.trim(),
+                phone: phone?.trim(),
+                website: website?.trim()
+            }
+        });
+
+        await user.save();
+        console.log("Agency user saved successfully:", { userId: user._id, email: user.email });
+
+        // Create Agency document
+        const Agency = require('./models/Agency');
+        const agency = new Agency({
+            user: user._id,
+            agencyName: agencyName.trim(),
+            description: description?.trim() || 'No description available',
+            industry: companyType || 'Not specified',
+            location: address?.trim() || 'Not specified',
+            contactEmail: email.trim(),
+            contactPhone: phone?.trim(),
+            website: website?.trim(),
+            specialties: specialties?.trim() ? [specialties.trim()] : [],
+            companySize: '1-10', // Default value
+            isVerified: false // Default value
+        });
+
+        await agency.save();
+        console.log("Agency record saved successfully:", { agencyId: agency._id });
+
+        // Set session data
+        req.session.userId = user._id;
+        req.session.userType = 'agency';
+        req.session.user = {
+            id: user._id,
+            email: user.email,
+            firstName: user.firstName,
+            userType: user.userType,
+            agencyName: user.agencyProfile.agencyName
+        };
+
+        // Save session before redirect
+        req.session.save((err) => {
+            if (err) {
+                console.error("Session save error:", err);
+                return res.render("agency-profile", { error: "Registration failed", userType: 'agency' });
+            }
+
+            console.log("Session saved, redirecting to agency dashboard");
+            return res.redirect("/agency/dashboard");
+        });
+    } catch (err) {
+        console.error('Agency registration error:', err);
+        return res.render("agency-profile", { error: "Registration failed", userType: 'agency' });
+    }
+});
+
 app.use((req, res, next) => {
     res.locals.flash = {
         success: req.session.success,
@@ -54,6 +146,12 @@ app.use((req, res, next) => {
     req.flash = (type, message) => {
         req.session[type] = message;
     };
+    console.log("\n--- Incoming Request ---");
+    console.log("URL:", req.url);
+    console.log("Method:", req.method);
+    console.log("Body:", req.body);
+    console.log("Session:", req.session);
+    console.log("Cookies:", req.cookies);
     next();
 });
 
@@ -64,17 +162,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/css", express.static(path.join(__dirname, "public/css")));
 app.use("/images", express.static(path.join(__dirname, "public/images")));
 app.use("/js", express.static(path.join(__dirname, "public/js")));
-
-if (process.env.NODE_ENV !== 'production') {
-    app.use((req, res, next) => {
-        console.log("\n--- Incoming Request ---");
-        console.log("URL:", req.url);
-        console.log("Method:", req.method);
-        console.log("Session:", req.session);
-        console.log("Cookies:", req.cookies);
-        next();
-    });
-}
 
 app.get("/register", (req, res) => {
     console.log("--- /register route hit (rendering register-options) ---");
@@ -281,79 +368,6 @@ app.post("/register/employer", async (req, res) => {
     } catch (err) {
         console.error('Employer registration error:', err);
         return res.render("register", { error: "Registration failed", userType: 'employer' });
-    }
-});
-
-app.post("/agency/create", async (req, res) => {
-    const {
-        agencyName,
-        email,
-        password,
-        companyType,
-        description,
-        foundedYear,
-        services,
-        specialties,
-        address,
-        phone,
-        website
-    } = req.body;
-    console.log("Agency registration attempt:", { email, agencyName });
-
-    try {
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            console.log("Email already registered:", email);
-            return res.render("agency-profile", { error: "Email already registered", userType: 'agency' });
-        }
-
-        // Create User document
-        const user = new User({
-            firstName: agencyName.trim(), // Using agency name as first name
-            lastName: "Agency".trim(), // Default lastName for agencies with proper trim
-            email: email.trim(),
-            password, // The pre-save middleware will hash this
-            userType: 'agency',
-            agencyProfile: {
-                agencyName: agencyName.trim(),
-                companyType,
-                description: description?.trim(),
-                foundedYear,
-                services: Array.isArray(services) ? services : [services],
-                specialties: specialties?.trim(),
-                address: address?.trim(),
-                phone: phone?.trim(),
-                website: website?.trim()
-            }
-        });
-
-        await user.save();
-        console.log("Agency user saved successfully:", { userId: user._id, email: user.email });
-
-        // Set session data
-        req.session.userId = user._id;
-        req.session.userType = 'agency';
-        req.session.user = {
-            id: user._id,
-            email: user.email,
-            firstName: user.firstName,
-            userType: user.userType,
-            agencyName: user.agencyProfile.agencyName
-        };
-
-        // Save session before redirect
-        req.session.save((err) => {
-            if (err) {
-                console.error("Session save error:", err);
-                return res.render("agency-profile", { error: "Registration failed", userType: 'agency' });
-            }
-
-            console.log("Session saved, redirecting to agency dashboard");
-            return res.redirect("/agency/dashboard");
-        });
-    } catch (err) {
-        console.error('Agency registration error:', err);
-        return res.render("agency-profile", { error: "Registration failed", userType: 'agency' });
     }
 });
 

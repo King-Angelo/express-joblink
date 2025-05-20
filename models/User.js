@@ -5,6 +5,7 @@ const JobApplication = require('./JobApplication');
 const JobAlert = require('./JobAlert');
 const JobAlertPreference = require('./JobAlertPreference');
 const Notification = require('./Notification');
+const Agency = require('./Agency');
 
 const ExperienceSchema = new mongoose.Schema({
     title: {
@@ -198,6 +199,12 @@ UserSchema.pre('deleteOne', { document: true, query: false }, async function(nex
             console.log(`Deleted employer record for user: ${userId}`);
         }
 
+        // Delete agency record if user is an agency
+        if (this.userType === 'agency') {
+            await Agency.deleteOne({ user: userId });
+            console.log(`Deleted agency record for user: ${userId}`);
+        }
+
         // Delete all related records
         await Promise.all([
             JobApplication.deleteMany({ jobseeker: userId }),
@@ -228,6 +235,12 @@ UserSchema.statics.safeDelete = async function(userId) {
         if (user.userType === 'employer') {
             await Employer.deleteOne({ user: userId });
             console.log(`Deleted employer record for user: ${userId}`);
+        }
+
+        // Delete agency record if user is an agency
+        if (user.userType === 'agency') {
+            await Agency.deleteOne({ user: userId });
+            console.log(`Deleted agency record for user: ${userId}`);
         }
 
         // Delete all related records
@@ -263,6 +276,12 @@ UserSchema.methods.safeDelete = async function() {
             console.log(`Deleted employer record for user: ${userId}`);
         }
 
+        // Delete agency record if user is an agency
+        if (this.userType === 'agency') {
+            await Agency.deleteOne({ user: userId });
+            console.log(`Deleted agency record for user: ${userId}`);
+        }
+
         // Delete job applications
         await JobApplication.deleteMany({ jobseeker: userId });
         console.log(`Deleted job applications for user: ${userId}`);
@@ -286,8 +305,8 @@ UserSchema.methods.safeDelete = async function() {
         return true;
     } catch (error) {
         console.error('Error in safeDelete:', error);
-    throw error;
-  }
+        throw error;
+    }
 };
 
 const User = mongoose.model("User", UserSchema);

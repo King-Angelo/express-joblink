@@ -5,46 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Create Agency Profile</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' style='font-family: Arial, sans-serif; font-weight: bold;'>J</text></svg>">
   <style>
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
       background: #fefefe;
-      min-height: 100vh;
-      position: relative;
       padding: 2rem;
     }
 
     .container {
       max-width: 800px;
       margin: 0 auto;
-      background: white;
-      padding: 2rem 2.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
 
     .home-button {
-      position: fixed;
-      top: 1rem;
-      left: 1rem;
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: #facc15;
+      color: #111;
       text-decoration: none;
-      color: #facc15;
-      font-size: 1.5rem;
+      border-radius: 0.5rem;
       font-weight: 600;
-      transition: color 0.2s;
-      z-index: 1000;
+      margin-bottom: 2rem;
     }
 
     .home-button:hover {
-      color: #eab308;
-    }
-
-    h1 {
-      text-align: center;
-      color: #222;
-      margin-bottom: 1.5rem;
+      background: #eab308;
     }
 
     .steps-container {
@@ -78,6 +64,7 @@
       background: white;
       padding: 2rem;
       border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
     .step-content.active {
@@ -92,22 +79,14 @@
       display: block;
       margin-bottom: 0.5rem;
       font-weight: 500;
-      color: #222;
     }
 
     input, textarea, select {
       width: 100%;
-      padding: 0.75rem 1rem;
+      padding: 0.75rem;
       border: 1px solid #ddd;
       border-radius: 0.5rem;
       font-size: 1rem;
-      transition: 0.2s;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      border-color: #facc15;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.2);
     }
 
     button {
@@ -118,7 +97,6 @@
       font-weight: 600;
       cursor: pointer;
       margin-right: 1rem;
-      transition: background 0.3s;
     }
 
     button:hover {
@@ -130,26 +108,13 @@
       justify-content: space-between;
       margin-top: 2rem;
     }
-
-    .error-message {
-      color: red;
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
   </style>
 </head>
 <body>
-  <a href="/" class="home-button">JobLink</a>
   <div class="container">
+    <a href="/" class="home-button">JobLink</a>
     <h1>Create Your Agency Profile</h1>
     
-    <% if (error) { %>
-      <div class="error-message">
-        <p><%= error %></p>
-      </div>
-    <% } %>
-
     <div class="steps-container">
       <div class="step active" data-step="1">Basic Information</div>
       <div class="step" data-step="2">Company Details</div>
@@ -157,7 +122,7 @@
       <div class="step" data-step="4">Contact Information</div>
     </div>
 
-    <form id="agencyForm" action="/agency/create" method="POST">
+    <form action="/register/agency" method="POST" id="agencyForm">
       <!-- Hidden field for lastName -->
       <input type="hidden" name="lastName" value="Agency">
       
@@ -233,14 +198,14 @@
         </div>
         <div class="form-group">
           <label for="website">Website</label>
-          <input type="url" id="website" name="website" required>
+          <input type="url" id="website" name="website">
         </div>
       </div>
 
       <div class="navigation-buttons">
         <button type="button" id="prevBtn" style="display: none;">Previous</button>
         <button type="button" id="nextBtn">Next</button>
-        <button type="submit" id="submitBtn" style="display: none;">Create Profile</button>
+        <button type="submit" id="submitBtn" style="display: none;">Submit</button>
       </div>
     </form>
   </div>
@@ -272,6 +237,25 @@
     }
 
     document.getElementById('nextBtn').addEventListener('click', () => {
+      // Validate current step before proceeding
+      const currentStepContent = document.querySelector(`.step-content[data-step="${currentStep}"]`);
+      const requiredFields = currentStepContent.querySelectorAll('[required]');
+      let isValid = true;
+
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          isValid = false;
+          field.style.borderColor = 'red';
+        } else {
+          field.style.borderColor = '#ddd';
+        }
+      });
+
+      if (!isValid) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
       if (currentStep < totalSteps) {
         currentStep++;
         updateStepDisplay();
@@ -283,6 +267,34 @@
         currentStep--;
         updateStepDisplay();
       }
+    });
+
+    // Add form submission handling
+    document.getElementById('agencyForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      console.log('Form submission attempted');
+      
+      // Validate all required fields
+      const requiredFields = this.querySelectorAll('[required]');
+      let isValid = true;
+      
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          isValid = false;
+          field.style.borderColor = 'red';
+        } else {
+          field.style.borderColor = '#ddd';
+        }
+      });
+
+      if (!isValid) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      // If all validations pass, submit the form
+      console.log('Form is valid, submitting...');
+      this.submit();
     });
 
     updateStepDisplay();
