@@ -23,7 +23,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const connectDB = async () => {
   try {
-        const mongoUri = process.env.MONGO_URI || 'mongodb+srv://nico:<niconiconico444>@cluster1.o1igl2i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1';
+        const mongoUri = process.env.MONGO_URI || 'mongodb+srv://nico:vlWGwax9UnZIi58H@cluster1.o1igl2i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1';
         console.log('Attempting to connect to MongoDB...');
         const conn = await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
