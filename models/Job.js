@@ -56,6 +56,17 @@ const jobSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
         index: true
+    },
+    employer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Employer',
+        required: true
+    },
+    status: {
+        type: String,
+        enum: ['active', 'draft', 'closed'],
+        default: 'active',
+        index: true
     }
 }, {
     timestamps: true

@@ -82,9 +82,9 @@
 
             <div class="text-center mt-4">
                 <% if (isAuthenticated) { %>
-                    <button class="btn btn-lg btn-primary">
+                    <a href="/jobs/<%= job._id %>/apply" class="btn btn-lg btn-primary">
                         <i class="fas fa-paper-plane me-2"></i> Apply for this Position
-                    </button>
+                    </a>
                 <% } else { %>
                     <div class="alert alert-info" role="alert">
                         <i class="fas fa-info-circle me-2"></i>

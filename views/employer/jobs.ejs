@@ -119,8 +119,8 @@
                                 <p class="mb-0"><%= job.description.substring(0, 200) %>...</p>
                             </div>
                             <div class="text-end">
-                                <span class="status-badge status-<%= job.status %>">
-                                    <%= job.status.charAt(0).toUpperCase() + job.status.slice(1) %>
+                                <span class="status-badge status-<%= job.status || 'active' %>">
+                                    <%= (job.status || 'active').charAt(0).toUpperCase() + (job.status || 'active').slice(1) %>
                                 </span>
                                 <div class="mt-2">
                                     <a href="/employer/jobs/<%= job._id %>/edit" class="btn btn-sm btn-outline-primary me-2">
@@ -228,11 +228,6 @@
             </div>
         </div>
     </div>
-
-    <% /* DEBUG: Output raw jobs array */ %>
-    <pre style="background:#f8f9fa; color:#333; padding:1em; border-radius:8px; overflow:auto;">
-    <%= JSON.stringify(jobs, null, 2) %>
-    </pre>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

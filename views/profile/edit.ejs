@@ -29,6 +29,10 @@
                     </div>
                 <% } %>
 
+                <% if (error) { %>
+                    <div class="alert alert-danger"><%= error %></div>
+                <% } %>
+
                 <div class="card mb-4">
                     <div class="card-header bg-primary text-white">
                         <h2 class="card-title mb-0">Edit Profile</h2>

@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Job = require('../models/Job');
 const User = require('../models/User');
+const multer = require('multer');
+const path = require('path');
+const JobApplication = require('../models/JobApplication');
+const { authMiddleware } = require('../middleware/authMiddleware');
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req, res, next) => {
@@ -10,6 +14,17 @@ const isAuthenticated = (req, res, next) => {
     }
     res.redirect('/login');
 };
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/applications');
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
 
 // Create sample jobs (for testing)
 router.get('/create-sample-jobs', async (req, res) => {
@@ -232,6 +247,45 @@ router.get('/', async (req, res) => {
     }
 });
 
+
+// Show the job application form
+router.get('/:id/apply', authMiddleware, async (req, res) => {
+    const jobId = req.params.id;
+    const job = await Job.findById(jobId);
+    if (!job) {
+        return res.status(404).render('error', { message: 'Job not found' });
+    }
+    res.render('jobs/apply', { job, user: req.user, isAuthenticated: true });
+});
+
+// Handle job application submission
+router.post('/:id/apply', authMiddleware, upload.single('resume'), async (req, res) => {
+    try {
+        const jobId = req.params.id;
+        const job = await Job.findById(jobId);
+        if (!job) {
+            return res.status(404).render('error', { message: 'Job not found' });
+        }
+        if (!req.file) {
+            return res.status(400).render('jobs/apply', { job, user: req.user, isAuthenticated: true, error: 'Resume is required.' });
+        }
+        const application = new JobApplication({
+            job: jobId,
+            jobseeker: req.user._id,
+            resume: '/uploads/applications/' + req.file.filename,
+            coverLetter: req.body.coverLetter || '',
+            status: 'pending',
+            createdAt: new Date(),
+            agencyId: job.agencyId,
+            targetType: job.agencyId ? 'agency' : 'employer'
+        });
+        await application.save();
+        res.render('jobs/apply', { job, user: req.user, isAuthenticated: true, success: 'Application submitted successfully!' });
+    } catch (err) {
+        console.error('Application submission error:', err);
+        res.status(500).render('error', { message: 'Error submitting application' });
+    }
+});
 // Get job details
 router.get('/:id', async (req, res) => {
     try {
@@ -256,5 +310,4 @@ router.get('/:id', async (req, res) => {
         });
     }
 });
-
 module.exports = router; 

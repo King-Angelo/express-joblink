@@ -71,6 +71,8 @@ router.get('/edit', authMiddleware, async (req, res, next) => {
 
 // Update profile
 router.post('/edit', authMiddleware, async (req, res, next) => {
+    console.log('=== PROFILE EDIT POST ROUTE HIT ===');
+    console.log('Profile update form data:', req.body);
     try {
         const {
             firstName,

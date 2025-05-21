@@ -1,0 +1,22 @@
+<%- include('../partials/header') %>
+<div class="container mt-4">
+    <h2>Apply for <%= job.title %> at <%= job.company %></h2>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success"><%= success %></div>
+    <% } %>
+    <form action="/jobs/<%= job._id %>/apply" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="resume" class="form-label">Resume (PDF, DOC, DOCX)</label>
+            <input type="file" class="form-control" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
+        </div>
+        <div class="mb-3">
+            <label for="coverLetter" class="form-label">Cover Letter</label>
+            <textarea class="form-control" id="coverLetter" name="coverLetter" rows="5"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Application</button>
+    </form>
+</div>
+<%- include('../partials/footer') %> 

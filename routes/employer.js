@@ -141,7 +141,8 @@ router.post('/jobs', authMiddleware, isEmployer, async (req, res) => {
     try {
         const jobData = {
             ...req.body,
-            employer: req.employer._id
+            employer: req.employer._id,
+            isActive: true // Ensure job is active by default
         };
 
         // Parse requirements and skills as arrays if they are comma-separated strings

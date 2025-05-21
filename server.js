@@ -434,9 +434,6 @@ app.get("/company-reviews", authMiddleware, (req, res) => {
     res.render("company-reviews/_partial", { reviews });
 });
 
-app.get("/profile/edit", authMiddleware, (req, res) => {
-    res.render("profile/edit", { user: req.user });
-});
 
 app.get("/saved-jobs", authMiddleware, (req, res) => {
     const savedJobs = [
@@ -529,6 +526,8 @@ app.get("/signout", (req, res) => {
         res.redirect("/");
     });
 });
+
+app.use('/profile', require('./routes/profile'));
 
 app.use((err, req, res, next) => {
     console.error("Global error:", err);
